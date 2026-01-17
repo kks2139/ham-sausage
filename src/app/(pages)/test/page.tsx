@@ -25,7 +25,14 @@ export default function Test() {
       />
 
       {!!popupImg && (
-        <div className={cn("img-popup")}>
+        <div
+          className={cn("img-popup")}
+          onClick={(e) => {
+            if ((e.target as HTMLElement).tagName.toLowerCase() !== "img") {
+              setPopupImg(null);
+            }
+          }}
+        >
           <div className={cn("content")}>
             <button
               className={cn("close-btn")}

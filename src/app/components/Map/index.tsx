@@ -4,7 +4,7 @@ import classNames from "classnames/bind";
 import Script from "next/script";
 import { useRef, useState } from "react";
 
-import ImgCat from "@/assets/img/cat_1.png";
+import { catInfos } from "@/app/utils/cats";
 
 import styles from "./index.module.scss";
 
@@ -21,7 +21,8 @@ export default function Map({ className, onClickCatMarker }: Props) {
   const mapDivRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<kakao.maps.Map>(null);
   const myMarkerRef = useRef<kakao.maps.Marker>(null);
-  const infoWindowRef = useRef<kakao.maps.InfoWindow>(null);
+  const myOverlayRef = useRef<kakao.maps.CustomOverlay>(null);
+  const catOverlaysRef = useRef<kakao.maps.CustomOverlay[]>([]);
   const randomMarkersRef = useRef<kakao.maps.Marker[]>([]);
 
   const initMap = () => {
@@ -60,9 +61,9 @@ export default function Map({ className, onClickCatMarker }: Props) {
 
           myMarkerRef.current = marker;
 
-          showMarkerInfo(
+          showMyOverLay(
             marker,
-            `<div style="color:black; font-weight:bold; font-size:14px;">
+            `<div class="my-overlay">
               <span>내 위치</span>
             </div>`
           );
@@ -90,7 +91,7 @@ export default function Map({ className, onClickCatMarker }: Props) {
     const markerImage = imageSrc
       ? new kakao.maps.MarkerImage(
           imageSrc,
-          new kakao.maps.Size(64, 64), // 마커이미지의 크기입니다
+          new kakao.maps.Size(40, 40), // 마커이미지의 크기입니다
           { offset: new kakao.maps.Point(0, 0) } // 마커이미지의 옵션입니다. 마커의 좌표와 일치시킬 이미지 안에서의 좌표를 설정합니다.
         )
       : undefined;
@@ -105,22 +106,20 @@ export default function Map({ className, onClickCatMarker }: Props) {
     return marker;
   };
 
-  const showMarkerInfo = (marker: kakao.maps.Marker, content: string) => {
+  const showMyOverLay = (marker: kakao.maps.Marker, content: string) => {
     if (!mapRef.current) {
       return;
     }
 
-    const infoWindow =
-      infoWindowRef.current ||
-      new kakao.maps.InfoWindow({
+    const overlay =
+      myOverlayRef.current ||
+      new kakao.maps.CustomOverlay({
+        map: mapRef.current,
         content,
-        removable: true,
+        position: marker.getPosition(),
       });
 
-    infoWindowRef.current = infoWindow;
-
-    // 인포윈도우를 마커위에 표시합니다
-    infoWindow.open(mapRef.current, marker);
+    myOverlayRef.current = overlay;
 
     // 중심좌표를 해당 위치로 부드럽게 이동
     mapRef.current.panTo(marker.getPosition());
@@ -141,24 +140,52 @@ export default function Map({ className, onClickCatMarker }: Props) {
     });
     randomMarkersRef.current = [];
 
-    // 2. 랜덤 마커 생성 및 Bounds 확장
-    for (let i = 0; i < 5; i++) {
+    catInfos.forEach(({ img, name, description }) => {
       const randomLatLng = getRandomLocation(
         position.getLat(),
         position.getLng(),
-        50
+        40
       );
 
-      const marker = showMarker(mapRef.current!, randomLatLng, ImgCat.src);
+      const marker = showMarker(mapRef.current!, randomLatLng, img.src);
 
       if (onClickCatMarker) {
         kakao.maps.event.addListener(marker, "click", () => {
-          onClickCatMarker(ImgCat.src);
+          onClickCatMarker(img.src);
         });
       }
 
+      // 이전에 생성한 overlay들 해제
+      catOverlaysRef.current.forEach((overlays) => {
+        overlays.setMap(null);
+      });
+      catOverlaysRef.current = [];
+
+      const catOverlay = new kakao.maps.CustomOverlay({
+        content: `<div class='cat-overlay'>
+            <div class='name'>
+              <span>이름 : </span>
+              <strong>${name}</strong>
+            </div>
+            <div class='description'>
+              <span>소개 : </span>
+              <strong>${description}</strong>
+            </div>
+          </div>`,
+        position: marker.getPosition(),
+      });
+
+      catOverlaysRef.current.push(catOverlay);
+
+      kakao.maps.event.addListener(marker, "mouseover", () => {
+        catOverlay.setMap(mapRef.current);
+      });
+      kakao.maps.event.addListener(marker, "mouseout", function () {
+        catOverlay.setMap(null);
+      });
+
       randomMarkersRef.current.push(marker);
-    }
+    });
   };
 
   const getRandomLocation = (
