@@ -8,17 +8,18 @@ declare global {
   }
 
   namespace kakao {
-    /** * 카카오맵 SDK 로드 함수 
+    /**
+     * 카카오맵 SDK 로드 함수 
      * autoload=false 파라미터 사용 시 명시적으로 호출해야 함
      */
     function init(appKey: string): void;
 
     namespace maps {
-      function load(callback: () => void): void;
-
       /**
        * 핵심 지도 클래스
        */
+      function load(callback: () => void): void;
+
       class Map {
         constructor(container: HTMLElement, options?: MapOptions);
         setCenter(latlng: LatLng): void;
@@ -44,6 +45,10 @@ declare global {
         addOverlayMapTypeId(mapTypeId: MapTypeId): void;
         removeOverlayMapTypeId(mapTypeId: MapTypeId): void;
         getNode(): HTMLElement;
+
+        // 추가된 핵심 이동 메서드
+        panTo(latlng: LatLng | Coords, padding?: number): void;
+        panBy(dx: number, dy: number): void;
       }
 
       interface MapOptions {
@@ -60,7 +65,7 @@ declare global {
       }
 
       /**
-       * 좌표 관련 클래스
+       * 좌표 및 기하 관련 클래스
        */
       class LatLng {
         constructor(latitude: number, longitude: number);
@@ -100,7 +105,7 @@ declare global {
       }
 
       /**
-       * 오버레이 (마커, 정보창 등)
+       * 오버레이 (마커, 정보창, 커스텀 오버레이)
        */
       class Marker {
         constructor(options: MarkerOptions);
@@ -213,20 +218,23 @@ declare global {
       }
 
       /**
-       * 도형 (Polyline, Polygon, Circle, Ellipse, Rectangle)
+       * 도형 (Polyline, Polygon, Circle, Rectangle, Ellipse)
        */
-      class Polyline {
-        constructor(options: PolylineOptions);
+      abstract class AbstractShape {
         setMap(map: Map | Roadview | null): void;
         getMap(): Map | Roadview | null;
-        setOptions(options: PolylineOptions): void;
-        setPath(path: LatLng[] | Coords[]): void;
-        getPath(): LatLng[];
-        getLength(): number;
+        setOptions(options: object): void;
         setVisible(visible: boolean): void;
         getVisible(): boolean;
         setZIndex(zIndex: number): void;
         getZIndex(): number;
+      }
+
+      class Polyline extends AbstractShape {
+        constructor(options: PolylineOptions);
+        setPath(path: LatLng[] | Coords[]): void;
+        getPath(): LatLng[];
+        getLength(): number;
       }
 
       interface PolylineOptions {
@@ -240,42 +248,96 @@ declare global {
         zIndex?: number;
       }
 
+      class Polygon extends AbstractShape {
+        constructor(options: PolygonOptions);
+        setPath(path: LatLng[] | Coords[] | LatLng[][] | Coords[][]): void;
+        getPath(): LatLng[] | LatLng[][];
+        getLength(): number;
+        getArea(): number;
+      }
+
+      interface PolygonOptions {
+        map?: Map;
+        path: LatLng[] | Coords[] | LatLng[][] | Coords[][];
+        strokeWeight?: number;
+        strokeColor?: string;
+        strokeOpacity?: number;
+        strokeStyle?: StrokeStyle;
+        fillColor?: string;
+        fillOpacity?: number;
+        zIndex?: number;
+      }
+
+      class Circle extends AbstractShape {
+        constructor(options: CircleOptions);
+        setPosition(position: LatLng | Coords): void;
+        getPosition(): LatLng;
+        setRadius(radius: number): void;
+        getRadius(): number;
+      }
+
+      interface CircleOptions {
+        map?: Map;
+        center: LatLng | Coords;
+        radius: number;
+        strokeWeight?: number;
+        strokeColor?: string;
+        strokeOpacity?: number;
+        strokeStyle?: StrokeStyle;
+        fillColor?: string;
+        fillOpacity?: number;
+        zIndex?: number;
+      }
+
       /**
        * 서비스 라이브러리 (libraries=services)
        */
       namespace services {
-        type ServiceCategoryCode =
-          | 'MT1' // 대형마트
-          | 'CS2' // 편의점
-          | 'PS3' // 어린이집, 유치원
-          | 'SC4' // 학교
-          | 'AC5' // 학원
-          | 'PK6' // 주차장
-          | 'OL7' // 주유소, 충전소
-          | 'SW8' // 지하철역
-          | 'BK9' // 은행
-          | 'CT1' // 문화시설
-          | 'AG2' // 중개업소
-          | 'PO3' // 공공기관
-          | 'AT4' // 관광명소
-          | 'AD5' // 숙박
-          | 'FD6' // 음식점
-          | 'CE7' // 카페
-          | 'HP8' // 병원
-          | 'PM9'; // 약국
+        type ServiceCategoryCode = 'MT1' | 'CS2' | 'PS3' | 'SC4' | 'AC5' | 'PK6' | 'OL7' | 'SW8' | 'BK9' | 'CT1' | 'AG2' | 'PO3' | 'AT4' | 'AD5' | 'FD6' | 'CE7' | 'HP8' | 'PM9';
 
         class Places {
           constructor(map?: Map);
-          keywordSearch(keyword: string, callback: (result: any[], status: Status, pagination: any) => void, options?: any): void;
-          categorySearch(categoryCode: ServiceCategoryCode, callback: (result: any[], status: Status, pagination: any) => void, options?: any): void;
+          keywordSearch(keyword: string, callback: (result: any[], status: Status, pagination: Pagination) => void, options?: PlacesOptions): void;
+          categorySearch(categoryCode: ServiceCategoryCode, callback: (result: any[], status: Status, pagination: Pagination) => void, options?: PlacesOptions): void;
+        }
+
+        interface PlacesOptions {
+          location?: LatLng;
+          radius?: number;
+          bounds?: LatLngBounds;
+          size?: number;
+          page?: number;
+          sort?: SortBy;
+          useMapCenter?: boolean;
+          useMapBounds?: boolean;
+        }
+
+        enum SortBy {
+          DISTANCE = 'DISTANCE',
+          ACCURACY = 'ACCURACY'
+        }
+
+        class Pagination {
+          totalCount: number;
+          hasNextPage: boolean;
+          hasPrevPage: boolean;
+          count: number;
+          current: number;
+          nextPage(): void;
+          prevPage(): void;
+          gotoPage(page: number): void;
+          gotoFirst(): void;
+          gotoLast(): void;
         }
 
         class Geocoder {
           constructor();
-          addressSearch(addr: string, callback: (result: any[], status: Status) => void, options?: any): void;
-          coord2Address(x: number, y: number, callback: (result: any[], status: Status) => void, options?: any): void;
-          coord2RegionCode(x: number, y: number, callback: (result: any[], status: Status) => void, options?: any): void;
+          addressSearch(addr: string, callback: (result: any[], status: Status) => void, options?: { page?: number; size?: number }): void;
+          coord2Address(x: number, y: number, callback: (result: any[], status: Status) => void, options?: { coord?: CoordsType }): void;
+          coord2RegionCode(x: number, y: number, callback: (result: any[], status: Status) => void, options?: { coord?: CoordsType }): void;
         }
+
+        type CoordsType = 'WGS84' | 'WCONGNAMUL' | 'CONGNAMUL' | 'WTM' | 'TM';
 
         enum Status {
           OK = 'OK',
@@ -327,9 +389,35 @@ declare global {
 
       type StrokeStyle = 'solid' | 'shortdash' | 'shortdot' | 'shortdashdot' | 'shortdashdotdot' | 'dot' | 'dash' | 'dashdot' | 'longdash' | 'longdashdot' | 'longdashdotdot';
 
-      /** 로드뷰 관련 (생략 가능하나 구조상 포함) */
+      /** 로드뷰 관련 */
       class Roadview {
-        constructor(container: HTMLElement, options?: any);
+        constructor(container: HTMLElement, options?: RoadviewOptions);
+        setPanoId(panoId: number, position: LatLng): void;
+        getPanoId(): number;
+        setViewpoint(viewpoint: Viewpoint): void;
+        getViewpoint(): Viewpoint;
+        getPosition(): LatLng;
+        relayout(): void;
+      }
+
+      interface RoadviewOptions {
+        panoId?: number;
+        panoX?: number;
+        panoY?: number;
+        tilt?: number;
+        pan?: number;
+        fov?: number;
+      }
+
+      interface Viewpoint {
+        pan: number;
+        tilt: number;
+        zoom?: number;
+      }
+
+      class RoadviewClient {
+        constructor();
+        getNearestPanoId(position: LatLng, radius: number, callback: (panoId: number | null) => void): void;
       }
     }
   }
