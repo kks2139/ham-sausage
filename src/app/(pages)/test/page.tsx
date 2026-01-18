@@ -46,7 +46,7 @@ export default function Test() {
                 setTimeout(() => {
                   cat.marker?.setMap(null);
                   setSelectedCat(undefined);
-                }, 500);
+                }, 1000);
               }}
             />
           </motion.div>

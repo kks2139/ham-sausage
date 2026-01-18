@@ -36,14 +36,16 @@ export default function Stage({ onClose, onWin }: Props) {
   const [hitInfo, setHitInfo] = useState({ myHit: false, enemyHit: false });
 
   const [isShowMenu, setIsShowMenu] = useState(false);
+  const [isShowDialog, setIsShowDialog] = useState(false);
   const [winner, setWinner] = useState<"me" | "enemy">();
 
   const isVictory = !!winner && winner === "me";
 
   const punch = async () => {
     const enemyHp = hpInfo.enemyHp - 2;
+    const isMyWin = enemyHp <= 0;
 
-    if (enemyHp <= 0) {
+    if (isMyWin) {
       setWinner("me");
     }
 
@@ -53,6 +55,12 @@ export default function Stage({ onClose, onWin }: Props) {
     await wait((PUNCH_DURATION + 0.2) * 1000);
 
     setHpInfo({ ...hpInfo, enemyHp });
+
+    if (isMyWin) {
+      await wait(300);
+
+      setIsShowDialog(true);
+    }
   };
 
   useEffect(() => {
@@ -60,7 +68,7 @@ export default function Stage({ onClose, onWin }: Props) {
       () => setIsShowMenu(true),
       (MY_MOTION_DURATION + MY_MOTION_DELAY + 0.3) * 1000
     );
-  }, []);
+  }, [setIsShowMenu]);
 
   return (
     <div className={cn("Stage")}>
@@ -195,7 +203,7 @@ export default function Stage({ onClose, onWin }: Props) {
       />
 
       <Dialog
-        isShow={!!winner}
+        isShow={isShowDialog}
         title={isVictory ? "승리" : "패배배"}
         subTitle={isVictory ? "적을 쓰러뜨렸습니다." : "패배하였습니다."}
         buttonLable={isVictory ? "좋은 싸움이었다" : "도망가자"}
