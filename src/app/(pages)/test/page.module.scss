@@ -16,25 +16,56 @@
     bottom: 0;
     left: 0;
     right: 0;
-    background-color: rgba(0, 0, 0, 0.8);
+    background-color: rgba(0, 0, 0, 0.9);
 
     .content {
+      position: relative;
       display: flex;
       justify-content: center;
       align-items: center;
       width: 100%;
       height: 100%;
 
+      box-shadow: 0 0 0 1px red inset;
+
       .close-btn {
         position: absolute;
-        top: 100px;
-        right: 60px;
+        top: 30px;
+        right: 40px;
         font-weight: bold;
         font-size: 24px;
       }
 
-      .img {
-        object-fit: contain;
+      .view {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        box-shadow: 0 0 0 5px forestgreen;
+
+        .cat-row {
+          width: 100%;
+          display: flex;
+          justify-content: flex-end;
+          box-shadow: 0 0 0 1px blue;
+
+          .cat {
+            box-shadow: 0 0 0 1px yellow inset;
+          }
+        }
+
+        .me-row {
+          width: 100%;
+          box-shadow: 0 0 0 1px blue;
+
+          .me {
+            box-shadow: 0 0 0 1px yellow inset;
+          }
+        }
+      }
+
+      .menu {
       }
     }
   }

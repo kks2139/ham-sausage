@@ -1,17 +1,18 @@
 "use client";
 
 import classNames from "classnames/bind";
-import Image from "next/image";
+import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 
 import Map from "@/app/components/Map";
+import Stage from "@/app/components/Stage";
 
 import styles from "./page.module.scss";
 
 const cn = classNames.bind(styles);
 
 export default function Test() {
-  const [popupImg, setPopupImg] = useState<string | null>(null);
+  const [isShowPopup, setIsShowPopup] = useState(false);
 
   return (
     <main className={cn("Test")}>
@@ -19,40 +20,28 @@ export default function Test() {
 
       <Map
         className={cn("map")}
-        onClickCatMarker={(catImg) => {
-          setPopupImg(catImg);
+        onClickCatMarker={() => {
+          setIsShowPopup(true);
         }}
       />
 
-      {!!popupImg && (
-        <div
-          className={cn("img-popup")}
-          onClick={(e) => {
-            if ((e.target as HTMLElement).tagName.toLowerCase() !== "img") {
-              setPopupImg(null);
-            }
-          }}
-        >
-          <div className={cn("content")}>
-            <button
-              className={cn("close-btn")}
-              onClick={() => {
-                setPopupImg(null);
+      <AnimatePresence>
+        {!!isShowPopup && (
+          <motion.div
+            className={cn("img-popup")}
+            initial={{ opacity: 0, scale: 0 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, transition: { duration: 0.1 } }}
+            transition={{ duration: 0.2 }}
+          >
+            <Stage
+              onClose={() => {
+                setIsShowPopup(false);
               }}
-            >
-              닫기
-            </button>
-
-            <Image
-              className={cn("img")}
-              src={popupImg}
-              alt=""
-              width={300}
-              height={300}
             />
-          </div>
-        </div>
-      )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </main>
   );
 }

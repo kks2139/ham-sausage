@@ -4,6 +4,7 @@ import classNames from "classnames/bind";
 import Script from "next/script";
 import { useRef, useState } from "react";
 
+import { useCatStore } from "@/app/store/cat";
 import { catInfos } from "@/app/utils/cats";
 
 import styles from "./index.module.scss";
@@ -12,10 +13,12 @@ const cn = classNames.bind(styles);
 
 interface Props {
   className?: string;
-  onClickCatMarker?: (catImg: string) => void;
+  onClickCatMarker?: () => void;
 }
 
 export default function Map({ className, onClickCatMarker }: Props) {
+  const { setSelectedCat } = useCatStore((s) => s.actions);
+
   const [isLoading, setIsLoading] = useState(false);
 
   const mapDivRef = useRef<HTMLDivElement>(null);
@@ -76,7 +79,7 @@ export default function Map({ className, onClickCatMarker }: Props) {
           res();
         },
         {
-          enableHighAccuracy: true,
+          // enableHighAccuracy: true,
         }
       );
     });
@@ -140,20 +143,20 @@ export default function Map({ className, onClickCatMarker }: Props) {
     });
     randomMarkersRef.current = [];
 
-    catInfos.forEach(({ img, name, description }) => {
+    catInfos.forEach((catInfo) => {
       const randomLatLng = getRandomLocation(
         position.getLat(),
         position.getLng(),
         40
       );
 
-      const marker = showMarker(mapRef.current!, randomLatLng, img.src);
+      const marker = showMarker(mapRef.current!, randomLatLng, catInfo.img.src);
 
-      if (onClickCatMarker) {
-        kakao.maps.event.addListener(marker, "click", () => {
-          onClickCatMarker(img.src);
-        });
-      }
+      kakao.maps.event.addListener(marker, "click", () => {
+        setSelectedCat(catInfo);
+
+        onClickCatMarker?.();
+      });
 
       // 이전에 생성한 overlay들 해제
       catOverlaysRef.current.forEach((overlays) => {
@@ -165,11 +168,11 @@ export default function Map({ className, onClickCatMarker }: Props) {
         content: `<div class='cat-overlay'>
             <div class='name'>
               <span>이름 : </span>
-              <strong>${name}</strong>
+              <strong>${catInfo.name}</strong>
             </div>
             <div class='description'>
               <span>소개 : </span>
-              <strong>${description}</strong>
+              <strong>${catInfo.description}</strong>
             </div>
           </div>`,
         position: marker.getPosition(),
