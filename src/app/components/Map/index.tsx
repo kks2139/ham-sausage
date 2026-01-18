@@ -79,7 +79,7 @@ export default function Map({ className, onClickCatMarker }: Props) {
           res();
         },
         {
-          // enableHighAccuracy: true,
+          enableHighAccuracy: true,
         }
       );
     });
@@ -153,7 +153,7 @@ export default function Map({ className, onClickCatMarker }: Props) {
       const marker = showMarker(mapRef.current!, randomLatLng, catInfo.img.src);
 
       kakao.maps.event.addListener(marker, "click", () => {
-        setSelectedCat(catInfo);
+        setSelectedCat({ ...catInfo, marker });
 
         onClickCatMarker?.();
       });

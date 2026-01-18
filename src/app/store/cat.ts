@@ -6,7 +6,7 @@ import { CatInfo } from "../utils/cats";
 interface CatStore {
   selectedCat?: CatInfo;
   actions: {
-    setSelectedCat: (value: CatInfo) => void;
+    setSelectedCat: (value: CatInfo | undefined) => void;
   };
 }
 

@@ -17,6 +17,7 @@ export interface CatInfo {
   img: StaticImageData;
   hp: number;
   punchPower: number;
+  marker?: kakao.maps.Marker;
 }
 
 export const catInfos: CatInfo[] = [

@@ -11,10 +11,17 @@ interface Props {
   isShow?: boolean;
   title?: string;
   subTitle?: string;
-  onConfirm?: () => void;
+  buttonLable?: string;
+  onButtonClick?: () => void;
 }
 
-export default function Dialog({ isShow, title, subTitle, onConfirm }: Props) {
+export default function Dialog({
+  isShow,
+  title,
+  subTitle,
+  buttonLable = "확인",
+  onButtonClick,
+}: Props) {
   return (
     <AnimatePresence>
       {isShow && (
@@ -27,8 +34,8 @@ export default function Dialog({ isShow, title, subTitle, onConfirm }: Props) {
           <div className={cn("content")}>
             <h3 className={cn("title")}>{title}</h3>
             <h5 className={cn("sub-title")}>{subTitle}</h5>
-            <button type="button" onClick={onConfirm}>
-              확인
+            <button type="button" onClick={onButtonClick}>
+              {buttonLable}
             </button>
           </div>
         </motion.div>

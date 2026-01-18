@@ -6,12 +6,14 @@ import { useState } from "react";
 
 import Map from "@/app/components/Map";
 import Stage from "@/app/components/Stage";
+import { useCatStore } from "@/app/store/cat";
 
 import styles from "./page.module.scss";
 
 const cn = classNames.bind(styles);
 
 export default function Test() {
+  const { setSelectedCat } = useCatStore((s) => s.actions);
   const [isShowPopup, setIsShowPopup] = useState(false);
 
   return (
@@ -37,6 +39,14 @@ export default function Test() {
             <Stage
               onClose={() => {
                 setIsShowPopup(false);
+              }}
+              onWin={(cat) => {
+                setIsShowPopup(false);
+
+                setTimeout(() => {
+                  cat.marker?.setMap(null);
+                  setSelectedCat(undefined);
+                }, 500);
               }}
             />
           </motion.div>
