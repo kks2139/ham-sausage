@@ -1,6 +1,22 @@
-.Main {
+.Entry {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   height: 100vh;
-  background-color: rgb(31, 31, 31);
-  color: white;
   padding: 20px;
+
+  .start-button {
+    padding: 10px 20px;
+    background-color: var(--yellow-1);
+    font-size: 25px;
+    font-weight: bold;
+    border-radius: 8px;
+    transform: translateY(60px);
+    transition: 0.2s;
+
+    &:active {
+      background-color: var(--yellow-2);
+    }
+  }
 }

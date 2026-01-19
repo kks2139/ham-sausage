@@ -10,6 +10,10 @@ import ImgCat7 from "@/assets/img/cat_7.png";
 import ImgCat8 from "@/assets/img/cat_8.png";
 import ImgCat9 from "@/assets/img/cat_9.png";
 import ImgCat10 from "@/assets/img/cat_10.png";
+import ImgCat11 from "@/assets/img/cat_11.png";
+import ImgCat12 from "@/assets/img/cat_12.png";
+import ImgCat13 from "@/assets/img/cat_13.png";
+import ImgCat14 from "@/assets/img/cat_14.png";
 
 export interface CatInfo {
   name: string;
@@ -72,5 +76,33 @@ export const catInfos: CatInfo[] = [
     hp: 10,
     punchPower: 1,
   },
-  { name: "뭉치", description: "불싯", img: ImgCat10, hp: 10, punchPower: 1 },
+  {
+    name: "소시지",
+    description: "크크큭",
+    img: ImgCat10,
+    hp: 10,
+    punchPower: 1,
+  },
+  {
+    name: "킬라그램",
+    description: "갓댐머니",
+    img: ImgCat11,
+    hp: 10,
+    punchPower: 1,
+  },
+  {
+    name: "내란 우두머리",
+    description: "애옹애옹",
+    img: ImgCat12,
+    hp: 10,
+    punchPower: 1,
+  },
+  { name: "소금빵", description: "어흥", img: ImgCat13, hp: 10, punchPower: 1 },
+  {
+    name: "창모",
+    description: "마애스트로~",
+    img: ImgCat14,
+    hp: 10,
+    punchPower: 1,
+  },
 ];

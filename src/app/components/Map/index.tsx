@@ -2,7 +2,7 @@
 
 import classNames from "classnames/bind";
 import Script from "next/script";
-import { useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { useCatStore } from "@/app/store/cat";
 import { catInfos } from "@/app/utils/cats";
@@ -28,27 +28,52 @@ export default function Map({ className, onClickCatMarker }: Props) {
   const catOverlaysRef = useRef<kakao.maps.CustomOverlay[]>([]);
   const randomMarkersRef = useRef<kakao.maps.Marker[]>([]);
 
-  const initMap = () => {
-    kakao.maps.load(() => {
-      if (!mapDivRef.current) {
+  // 지도에 마커를 표시하는 함수입니다
+  const showMarker = useCallback(
+    (map: kakao.maps.Map, position: kakao.maps.LatLng, imageSrc?: string) => {
+      const markerImage = imageSrc
+        ? new kakao.maps.MarkerImage(
+            imageSrc,
+            new kakao.maps.Size(40, 40), // 마커이미지의 크기입니다
+            { offset: new kakao.maps.Point(0, 0) } // 마커이미지의 옵션입니다. 마커의 좌표와 일치시킬 이미지 안에서의 좌표를 설정합니다.
+          )
+        : undefined;
+
+      // 마커를 생성합니다
+      const marker = new kakao.maps.Marker({
+        map,
+        position,
+        image: markerImage,
+      });
+
+      return marker;
+    },
+    []
+  );
+
+  const showMyOverLay = useCallback(
+    (marker: kakao.maps.Marker, content: string) => {
+      if (!mapRef.current) {
         return;
       }
 
-      // 지도를 생성합니다
-      const map = new kakao.maps.Map(mapDivRef.current, {
-        center: new kakao.maps.LatLng(37.566826, 126.9786567),
-        level: -2, // 지도의 확대 레벨
-      });
+      const overlay =
+        myOverlayRef.current ||
+        new kakao.maps.CustomOverlay({
+          map: mapRef.current,
+          content,
+          position: marker.getPosition(),
+        });
 
-      // map.setZoomable(false);
+      myOverlayRef.current = overlay;
 
-      mapRef.current = map;
+      // 중심좌표를 해당 위치로 부드럽게 이동
+      mapRef.current.panTo(marker.getPosition());
+    },
+    []
+  );
 
-      showMyPosition();
-    });
-  };
-
-  const showMyPosition = async () => {
+  const showMyPosition = useCallback(async () => {
     if (!mapRef.current || !navigator.geolocation) {
       return;
     }
@@ -83,50 +108,27 @@ export default function Map({ className, onClickCatMarker }: Props) {
         }
       );
     });
-  };
+  }, [showMarker, showMyOverLay]);
 
-  // 지도에 마커를 표시하는 함수입니다
-  const showMarker = (
-    map: kakao.maps.Map,
-    position: kakao.maps.LatLng,
-    imageSrc?: string
-  ) => {
-    const markerImage = imageSrc
-      ? new kakao.maps.MarkerImage(
-          imageSrc,
-          new kakao.maps.Size(40, 40), // 마커이미지의 크기입니다
-          { offset: new kakao.maps.Point(0, 0) } // 마커이미지의 옵션입니다. 마커의 좌표와 일치시킬 이미지 안에서의 좌표를 설정합니다.
-        )
-      : undefined;
+  const initMap = useCallback(() => {
+    kakao.maps.load(() => {
+      if (!mapDivRef.current) {
+        return;
+      }
 
-    // 마커를 생성합니다
-    const marker = new kakao.maps.Marker({
-      map,
-      position,
-      image: markerImage,
-    });
-
-    return marker;
-  };
-
-  const showMyOverLay = (marker: kakao.maps.Marker, content: string) => {
-    if (!mapRef.current) {
-      return;
-    }
-
-    const overlay =
-      myOverlayRef.current ||
-      new kakao.maps.CustomOverlay({
-        map: mapRef.current,
-        content,
-        position: marker.getPosition(),
+      // 지도를 생성합니다
+      const map = new kakao.maps.Map(mapDivRef.current, {
+        center: new kakao.maps.LatLng(37.566826, 126.9786567),
+        level: -2, // 지도의 확대 레벨
       });
 
-    myOverlayRef.current = overlay;
+      // map.setZoomable(false);
 
-    // 중심좌표를 해당 위치로 부드럽게 이동
-    mapRef.current.panTo(marker.getPosition());
-  };
+      mapRef.current = map;
+
+      showMyPosition();
+    });
+  }, [showMyPosition]);
 
   const showRandomCatMarkers = async () => {
     await showMyPosition();
@@ -200,6 +202,12 @@ export default function Map({ className, onClickCatMarker }: Props) {
     const lng_diff = (Math.random() - 0.5) * 2 * (radiusInMeters / 88000);
     return new kakao.maps.LatLng(lat + lat_diff, lng + lng_diff);
   };
+
+  useEffect(() => {
+    if (window.kakao?.maps) {
+      initMap();
+    }
+  }, [initMap]);
 
   return (
     <>
