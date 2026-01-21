@@ -1,6 +1,7 @@
 import classNames from "classnames/bind";
 import { AnimatePresence, motion } from "framer-motion";
 
+import Button from "../../Button";
 import styles from "./index.module.scss";
 
 const cn = classNames.bind(styles);
@@ -23,27 +24,34 @@ export default function Control({ isShowMenu, onPunch, onRun }: Props) {
             transition={{ duration: 0.2 }}
           >
             <li>
-              <button
-                type="button"
+              <Button
+                size="large"
                 onClick={() => {
                   onPunch();
                 }}
               >
                 냥냥펀치
-              </button>
+              </Button>
             </li>
             <li>
-              <button type="button">유혹</button>
+              <Button
+                size="large"
+                onClick={() => {
+                  // TODO: 고양이밥
+                }}
+              >
+                유혹
+              </Button>
             </li>
             <li>
-              <button
-                type="button"
+              <Button
+                size="large"
                 onClick={() => {
                   onRun();
                 }}
               >
                 튀자
-              </button>
+              </Button>
             </li>
           </motion.ul>
         )}

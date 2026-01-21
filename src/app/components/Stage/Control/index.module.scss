@@ -11,20 +11,20 @@
     flex-direction: column;
     row-gap: 10px;
 
-    li {
-      font-size: 25px;
+    // li {
+    //   font-size: 25px;
 
-      button {
-        width: 100%;
-        padding: 10px 20px;
-        background-color: rgb(54, 54, 54);
-        border-radius: 10px;
-        transition: 0.1s;
+    //   button {
+    //     width: 100%;
+    //     padding: 10px 20px;
+    //     background-color: rgb(54, 54, 54);
+    //     border-radius: 10px;
+    //     transition: 0.1s;
 
-        &:active {
-          scale: 0.97;
-        }
-      }
-    }
+    //     &:active {
+    //       scale: 0.97;
+    //     }
+    //   }
+    // }
   }
 }

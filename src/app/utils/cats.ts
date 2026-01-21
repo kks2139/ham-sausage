@@ -70,15 +70,15 @@ export const catInfos: CatInfo[] = [
     punchPower: 1,
   },
   {
-    name: "비실이",
+    name: "소시지",
     description: "하아아암~",
     img: ImgCat9,
     hp: 10,
     punchPower: 1,
   },
   {
-    name: "소시지",
-    description: "크크큭",
+    name: "뭉치",
+    description: "불싯",
     img: ImgCat10,
     hp: 10,
     punchPower: 1,

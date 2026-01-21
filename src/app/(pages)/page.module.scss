@@ -6,17 +6,10 @@
   height: 100vh;
   padding: 20px;
 
-  .start-button {
-    padding: 10px 20px;
-    background-color: var(--yellow-1);
-    font-size: 25px;
-    font-weight: bold;
-    border-radius: 8px;
-    transform: translateY(60px);
-    transition: 0.2s;
-
-    &:active {
-      background-color: var(--yellow-2);
-    }
+  .menu {
+    display: flex;
+    flex-direction: column;
+    row-gap: 5px;
+    transform: translateY(50px);
   }
 }

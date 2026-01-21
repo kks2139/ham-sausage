@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { headers } from "next/headers";
 
 import { DeviceProvider } from "./components/DeviceProvider";
+import ToastMessage from "./components/ToastMessage";
 
 export const metadata: Metadata = {
   title: "캣갱",
@@ -23,7 +24,10 @@ export default async function RootLayout({
   return (
     <html lang="ko">
       <DeviceProvider isMobile={isMobile}>
-        <body>{children}</body>
+        <body>
+          {children}
+          <ToastMessage />
+        </body>
       </DeviceProvider>
     </html>
   );

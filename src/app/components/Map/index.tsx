@@ -7,6 +7,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useCatStore } from "@/app/store/cat";
 import { catInfos } from "@/app/utils/cats";
 
+import Button from "../Button";
 import styles from "./index.module.scss";
 
 const cn = classNames.bind(styles);
@@ -223,20 +224,24 @@ export default function Map({ className, onClickCatMarker }: Props) {
         )}
 
         <div className={cn("buttons")}>
-          <button
+          <Button
+            disabled={isLoading}
+            size="small"
             onClick={() => {
               showMyPosition();
             }}
           >
             내 위치
-          </button>
-          <button
+          </Button>
+          <Button
+            disabled={isLoading}
+            size="small"
             onClick={() => {
               showRandomCatMarkers();
             }}
           >
-            내 주변 고양이
-          </button>
+            내 주변 냥아치
+          </Button>
         </div>
       </div>
 
