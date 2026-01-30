@@ -81,10 +81,32 @@ export default function FindCat() {
               >
                 닫기
               </button>
-              {selectedMenu === "catched" &&
-                (catchedCats.length > 0 ? (
+
+              <div className={cn("wrapper")}>
+                {selectedMenu === "catched" &&
+                  (catchedCats.length > 0 ? (
+                    <ul>
+                      {catchedCats.map(({ name, img, description }) => (
+                        <li key={name}>
+                          <Image
+                            src={img.src}
+                            alt={name}
+                            width={50}
+                            height={50}
+                          />
+                          <span>{name} :</span>
+                          <span>{description}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <div className={cn("empty")}>
+                      크흡.. 부하가 하나도 없다니
+                    </div>
+                  ))}
+                {selectedMenu === "all" && (
                   <ul>
-                    {catchedCats.map(({ name, img, description }) => (
+                    {catInfos.map(({ name, img, description }) => (
                       <li key={name}>
                         <Image
                           src={img.src}
@@ -97,20 +119,8 @@ export default function FindCat() {
                       </li>
                     ))}
                   </ul>
-                ) : (
-                  <div className={cn("empty")}>크흡.. 부하가 하나도 없다니</div>
-                ))}
-              {selectedMenu === "all" && (
-                <ul>
-                  {catInfos.map(({ name, img, description }) => (
-                    <li key={name}>
-                      <Image src={img.src} alt={name} width={50} height={50} />
-                      <span className={cn("name")}>{name} :</span>
-                      <span className={cn("name")}>{description}</span>
-                    </li>
-                  ))}
-                </ul>
-              )}
+                )}
+              </div>
             </motion.div>
           )}
         </AnimatePresence>

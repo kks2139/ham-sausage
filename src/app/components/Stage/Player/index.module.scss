@@ -1,0 +1,70 @@
+.Player {
+  width: 100%;
+  display: flex;
+  column-gap: 20px;
+  color: white;
+
+  &.align-right {
+    justify-content: flex-end;
+  }
+
+  .introduce {
+    font-size: 20px;
+
+    &.me {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+    }
+
+    strong {
+      font-weight: bold;
+      color: var(--yellow-1);
+    }
+  }
+
+  .imgs {
+    position: relative;
+
+    .cat-img {
+      &.hit {
+        animation: shake 0.5s;
+      }
+    }
+
+    .punch-img {
+      position: absolute;
+      bottom: -20px;
+      transform: rotate(45deg);
+    }
+
+    @keyframes shake {
+      0% {
+        transform: translateX(0);
+      }
+      33% {
+        transform: translateX(-10px);
+      }
+      66% {
+        transform: translateX(10px);
+      }
+      100% {
+        transform: translateX(0);
+      }
+    }
+  }
+
+  .hp-bar {
+    width: 140px;
+    height: 10px;
+    border-radius: 8px;
+    box-shadow: 0 0 0 2px white;
+
+    .value {
+      height: 100%;
+      border-radius: 8px;
+      background-color: var(--green-1);
+      transition: 0.3s;
+    }
+  }
+}

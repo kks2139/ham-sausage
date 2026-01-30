@@ -9,10 +9,16 @@ const cn = classNames.bind(styles);
 interface Props {
   isShowMenu: boolean;
   onPunch: () => void;
+  onTempt: () => void;
   onRun: () => void;
 }
 
-export default function Control({ isShowMenu, onPunch, onRun }: Props) {
+export default function Control({
+  isShowMenu,
+  onPunch,
+  onTempt,
+  onRun,
+}: Props) {
   return (
     <div className={cn("Control")}>
       <AnimatePresence>
@@ -37,7 +43,7 @@ export default function Control({ isShowMenu, onPunch, onRun }: Props) {
               <Button
                 size="large"
                 onClick={() => {
-                  // TODO: 고양이밥
+                  onTempt();
                 }}
               >
                 유혹
@@ -50,7 +56,7 @@ export default function Control({ isShowMenu, onPunch, onRun }: Props) {
                   onRun();
                 }}
               >
-                튀자
+                튄다
               </Button>
             </li>
           </motion.ul>

@@ -1,19 +1,17 @@
 "use client";
 
 import classNames from "classnames/bind";
-import { AnimatePresence, motion } from "framer-motion";
-import Image from "next/image";
 import { useEffect, useState } from "react";
 
 import { useCatStore } from "@/app/store/cat";
 import { CatInfo } from "@/app/utils/cats";
 import { wait } from "@/app/utils/helper";
-import ImgCatFoot from "@/assets/img/cat_foot.png";
 import ImgCatMe from "@/assets/img/cat_me.png";
 
 import Dialog from "../Dialog";
 import Control from "./Control";
 import styles from "./index.module.scss";
+import Player from "./Player";
 
 const cn = classNames.bind(styles);
 
@@ -34,6 +32,10 @@ export default function Stage({ onClose, onWin }: Props) {
     enemyHp: selectedCat?.hp || 0,
   });
   const [hitInfo, setHitInfo] = useState({ myHit: false, enemyHit: false });
+  // const [temptInfo, setTemptInfo] = useState({
+  //   myTempted: false,
+  //   enemyTempted: false,
+  // });
 
   const [isShowMenu, setIsShowMenu] = useState(false);
   const [isShowDialog, setIsShowDialog] = useState(false);
@@ -63,6 +65,10 @@ export default function Stage({ onClose, onWin }: Props) {
     }
   };
 
+  const tepmt = () => {
+    //
+  };
+
   useEffect(() => {
     setTimeout(
       () => setIsShowMenu(true),
@@ -73,132 +79,59 @@ export default function Stage({ onClose, onWin }: Props) {
   return (
     <div className={cn("Stage")}>
       <div className={cn("view")}>
-        <div className={cn("staus-row", { "align-right": true })}>
-          <motion.div
-            className={cn("introduce")}
-            initial={{ opacity: 0, y: -50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.2, delay: 0.5 }}
-          >
-            <div>
-              <span>이름 : </span>
-              <strong>{selectedCat?.name}</strong>
-            </div>
-            <div>
-              <span>울음 : </span>
-              <strong>{selectedCat?.description}</strong>
-            </div>
-            <div>
-              <span>HP : </span>
-              <div className={cn("hp-bar")}>
-                <div
-                  className={cn("value")}
-                  style={{
-                    width: `${
-                      (hpInfo.enemyHp / (selectedCat?.hp || 0)) * 100
-                    }%`,
-                  }}
-                ></div>
-              </div>
-            </div>
-          </motion.div>
+        <Player
+          side="enemy"
+          cat={selectedCat}
+          hp={hpInfo.enemyHp}
+          punched={hitInfo.enemyHit}
+          punchDuraion={PUNCH_DURATION}
+          introMotion={{
+            initial: { opacity: 0, y: -50 },
+            animate: { opacity: 1, y: 0 },
+            transition: { duration: 0.2, delay: 0.5 },
+          }}
+          catImgIntroMotion={{
+            initial: { opacity: 0, x: 100 },
+            animate: { opacity: 1, x: 0 },
+            transition: { duration: 0.3, delay: 0.2 },
+          }}
+        />
 
-          <motion.div
-            className={cn("imgs")}
-            initial={{ opacity: 0, x: 100 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.3, delay: 0.2 }}
-          >
-            <Image
-              className={cn("cat-img", { hit: hitInfo.enemyHit })}
-              src={selectedCat?.img.src || ""}
-              alt={selectedCat?.name || ""}
-              width={170}
-              height={170}
-            />
-
-            <AnimatePresence>
-              {hitInfo.enemyHit &&
-                Array.from({ length: 2 }, (_, i) => {
-                  const isFirst = i === 0;
-                  const moveX = 30;
-
-                  return (
-                    <motion.div
-                      key={i}
-                      initial={{ opacity: 0, x: isFirst ? -moveX : 0 }}
-                      animate={{ opacity: 1, x: isFirst ? 0 : moveX }}
-                      transition={{
-                        duration: PUNCH_DURATION,
-                        delay: isFirst ? 0 : 0.2,
-                      }}
-                    >
-                      <Image
-                        className={cn("punch-img", { hit: hitInfo.enemyHit })}
-                        src={ImgCatFoot.src}
-                        alt=""
-                        width={30}
-                        height={60}
-                      />
-                    </motion.div>
-                  );
-                })}
-            </AnimatePresence>
-          </motion.div>
-        </div>
-
-        <div className={cn("staus-row")}>
-          <motion.div
-            initial={{ opacity: 0, x: -100 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{
+        <Player
+          side="me"
+          cat={{
+            img: ImgCatMe,
+            description: "키야오오오",
+            hp: 10,
+            name: "나",
+            punchPower: 1,
+          }}
+          hp={hpInfo.myHp}
+          punched={hitInfo.myHit}
+          punchDuraion={PUNCH_DURATION}
+          catImgIntroMotion={{
+            initial: { opacity: 0, x: -100 },
+            animate: { opacity: 1, x: 0 },
+            transition: {
               duration: MY_MOTION_DURATION,
               delay: MY_MOTION_DELAY,
-            }}
-          >
-            <Image
-              className={cn("cat-img")}
-              src={ImgCatMe}
-              alt=""
-              width={150}
-              height={150}
-            />
-          </motion.div>
-
-          <motion.div
-            className={cn("introduce")}
-            initial={{ opacity: 0, y: -50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{
+            },
+          }}
+          introMotion={{
+            initial: { opacity: 0, y: -50 },
+            animate: { opacity: 1, y: 0 },
+            transition: {
               duration: 0.3,
               delay: MY_MOTION_DURATION + MY_MOTION_DELAY,
-            }}
-          >
-            <div>
-              <span>나</span>
-            </div>
-            <div>
-              <span>울음 : </span>
-              <strong>키야오오오</strong>
-            </div>
-            <div>
-              <span>HP : </span>
-              <div className={cn("hp-bar")}>
-                <div
-                  className={cn("value")}
-                  style={{
-                    width: `${(hpInfo.myHp / (selectedCat?.hp || 0)) * 100}%`,
-                  }}
-                ></div>
-              </div>
-            </div>
-          </motion.div>
-        </div>
+            },
+          }}
+        />
       </div>
 
       <Control
         isShowMenu={isShowMenu}
         onPunch={punch}
+        onTempt={tepmt}
         onRun={() => onClose?.()}
       />
 
