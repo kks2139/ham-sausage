@@ -1,3 +1,4 @@
+import NumberFlow from "@number-flow/react";
 import classNames from "classnames/bind";
 import { motion, MotionNodeAnimationOptions } from "framer-motion";
 import Image from "next/image";
@@ -18,27 +19,28 @@ interface IntroduceProps {
 
 function Introduce({ isMe, cat, introMotion, hp }: IntroduceProps) {
   return (
-    <motion.div className={cn("introduce", { me: isMe })} {...introMotion}>
-      <div>
-        <span>이름 : </span>
+    <motion.ul className={cn("introduce", { me: isMe })} {...introMotion}>
+      <li>
+        <div className={cn("label")}>이름</div>
         <strong>{cat?.name}</strong>
-      </div>
-      <div>
-        <span>울음 : </span>
+      </li>
+      <li>
+        <div className={cn("label")}>울음</div>
         <strong>{cat?.crying}</strong>
-      </div>
-      <div>
-        <span>HP : </span>
+      </li>
+      <li className={cn("hp")}>
+        <div className={cn("label")}>HP</div>
         <div className={cn("hp-bar")}>
           <div
-            className={cn("value")}
+            className={cn("bar")}
             style={{
               width: `${(hp / (cat?.hp || 0)) * 100}%`,
             }}
           ></div>
         </div>
-      </div>
-    </motion.div>
+        <NumberFlow className={cn("value")} value={hp} />
+      </li>
+    </motion.ul>
   );
 }
 

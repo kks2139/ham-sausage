@@ -29,7 +29,7 @@ export default function Stage({ onClose, onWin }: Props) {
   const [me] = useState(myCat);
 
   const [hpInfo, setHpInfo] = useState({
-    myHp: 10,
+    myHp: myCat.hp,
     enemyHp: selectedCat?.hp || 0,
   });
   const [hitInfo, setHitInfo] = useState({ myHit: false, enemyHit: false });
