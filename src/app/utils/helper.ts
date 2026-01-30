@@ -23,3 +23,13 @@ export const getPostposition = (
 
   return `${word}${mapping[type]}`;
 };
+
+export const getRandomLocation = (
+  lat: number,
+  lng: number,
+  radiusInMeters: number
+): kakao.maps.LatLng => {
+  const lat_diff = (Math.random() - 0.5) * 2 * (radiusInMeters / 111000);
+  const lng_diff = (Math.random() - 0.5) * 2 * (radiusInMeters / 88000);
+  return new kakao.maps.LatLng(lat + lat_diff, lng + lng_diff);
+};

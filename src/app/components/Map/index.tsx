@@ -1,11 +1,15 @@
 "use client";
 
 import classNames from "classnames/bind";
+import { AnimatePresence, motion } from "framer-motion";
+import Image from "next/image";
 import Script from "next/script";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { useCatStore } from "@/app/store/cat";
 import { catCharacters } from "@/app/utils/cats";
+import { getRandomLocation } from "@/app/utils/helper";
+import ImgCatGuide from "@/assets/img/cat_guide.png";
 
 import Button from "../Button";
 import styles from "./index.module.scss";
@@ -111,27 +115,7 @@ export default function Map({ className, onClickCatMarker }: Props) {
     });
   }, [showMarker, showMyOverLay]);
 
-  const initMap = useCallback(() => {
-    kakao.maps.load(() => {
-      if (!mapDivRef.current) {
-        return;
-      }
-
-      // 지도를 생성합니다
-      const map = new kakao.maps.Map(mapDivRef.current, {
-        center: new kakao.maps.LatLng(37.566826, 126.9786567),
-        level: -2, // 지도의 확대 레벨
-      });
-
-      // map.setZoomable(false);
-
-      mapRef.current = map;
-
-      showMyPosition();
-    });
-  }, [showMyPosition]);
-
-  const showRandomCatMarkers = async () => {
+  const showRandomCatMarkers = useCallback(async () => {
     await showMyPosition();
 
     if (!myMarkerRef.current) {
@@ -192,17 +176,27 @@ export default function Map({ className, onClickCatMarker }: Props) {
 
       randomMarkersRef.current.push(marker);
     });
-  };
+  }, [onClickCatMarker, setSelectedCat, showMarker, showMyPosition]);
 
-  const getRandomLocation = (
-    lat: number,
-    lng: number,
-    radiusInMeters: number
-  ): kakao.maps.LatLng => {
-    const lat_diff = (Math.random() - 0.5) * 2 * (radiusInMeters / 111000);
-    const lng_diff = (Math.random() - 0.5) * 2 * (radiusInMeters / 88000);
-    return new kakao.maps.LatLng(lat + lat_diff, lng + lng_diff);
-  };
+  const initMap = useCallback(() => {
+    kakao.maps.load(() => {
+      if (!mapDivRef.current) {
+        return;
+      }
+
+      // 지도를 생성합니다
+      const map = new kakao.maps.Map(mapDivRef.current, {
+        center: new kakao.maps.LatLng(37.566826, 126.9786567),
+        level: -2, // 지도의 확대 레벨
+      });
+
+      // map.setZoomable(false);
+
+      mapRef.current = map;
+
+      showRandomCatMarkers();
+    });
+  }, [showRandomCatMarkers]);
 
   useEffect(() => {
     if (window.kakao?.maps) {
@@ -215,28 +209,43 @@ export default function Map({ className, onClickCatMarker }: Props) {
       <div className={cn("Map", className)}>
         <div ref={mapDivRef} className={cn("map-content")}></div>
 
-        {isLoading && (
-          <div className={cn("loading")}>
-            {["찾", "는", "중", ".", ".", "."].map((ch, i) => (
-              <span key={i}>{ch}</span>
-            ))}
-          </div>
-        )}
+        <AnimatePresence>
+          {isLoading && (
+            <motion.div
+              className={cn("loading")}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.1 }}
+            >
+              <Image src={ImgCatGuide} alt="" width={50} height={50} />
+              {["찾", "는", "중", ".", ".", "."].map((ch, i) => (
+                <span key={i}>{ch}</span>
+              ))}
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         <div className={cn("buttons")}>
           <Button
-            disabled={isLoading}
             size="small"
             onClick={() => {
+              if (isLoading) {
+                return;
+              }
+
               showMyPosition();
             }}
           >
             내 위치
           </Button>
           <Button
-            disabled={isLoading}
             size="small"
             onClick={() => {
+              if (isLoading) {
+                return;
+              }
+
               showRandomCatMarkers();
             }}
           >
