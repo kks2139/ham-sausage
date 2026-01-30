@@ -38,7 +38,7 @@ export default function Stage({ onClose, onWin }: Props) {
   //   enemyTempted: false,
   // });
 
-  const [isShowMenu, setIsShowMenu] = useState(false);
+  const [isShowControl, setIsShowControl] = useState(false);
   const [isShowDialog, setIsShowDialog] = useState(false);
   const [winner, setWinner] = useState<"me" | "enemy">();
 
@@ -72,10 +72,10 @@ export default function Stage({ onClose, onWin }: Props) {
 
   useEffect(() => {
     setTimeout(
-      () => setIsShowMenu(true),
+      () => setIsShowControl(true),
       (MY_MOTION_DURATION + MY_MOTION_DELAY + 0.3) * 1000
     );
-  }, [setIsShowMenu]);
+  }, [setIsShowControl]);
 
   return (
     <div className={cn("Stage")}>
@@ -124,7 +124,7 @@ export default function Stage({ onClose, onWin }: Props) {
       </div>
 
       <Control
-        isShowMenu={isShowMenu}
+        isShow={isShowControl}
         onPunch={punch}
         onTempt={tepmt}
         onRun={() => onClose?.()}

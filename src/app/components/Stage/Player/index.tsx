@@ -64,8 +64,8 @@ function CatVisual({
         className={cn("cat-img", { hit: punched })}
         src={cat?.img.src || ""}
         alt={cat?.name || ""}
-        width={170}
-        height={170}
+        width={100}
+        height={100}
       />
       {children}
     </motion.div>

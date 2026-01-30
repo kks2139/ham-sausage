@@ -1,7 +1,7 @@
 .Player {
   width: 100%;
   display: flex;
-  column-gap: 20px;
+  column-gap: 15px;
   color: white;
 
   &.align-right {
@@ -9,7 +9,7 @@
   }
 
   .introduce {
-    font-size: 20px;
+    font-size: 15px;
 
     &.me {
       display: flex;
@@ -23,7 +23,7 @@
     }
 
     .label {
-      width: 55px;
+      width: 40px;
       // box-shadow: 0 0 0 1px red;
     }
 

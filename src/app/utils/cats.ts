@@ -139,7 +139,7 @@ export const catCharacters = [
   },
   {
     name: "구마적",
-    crying: "끄아아아앙!(종로!)", // 포효
+    crying: "끄아아아앙! (우미관!)", // 포효
     img: ImgCat8,
     hp: 10,
     punchPower: 1,
