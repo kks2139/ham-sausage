@@ -5,7 +5,7 @@ import Script from "next/script";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { useCatStore } from "@/app/store/cat";
-import { catInfos } from "@/app/utils/cats";
+import { catCharacters } from "@/app/utils/cats";
 
 import Button from "../Button";
 import styles from "./index.module.scss";
@@ -146,17 +146,17 @@ export default function Map({ className, onClickCatMarker }: Props) {
     });
     randomMarkersRef.current = [];
 
-    catInfos.forEach((catInfo) => {
+    catCharacters.forEach((cat) => {
       const randomLatLng = getRandomLocation(
         position.getLat(),
         position.getLng(),
         40
       );
 
-      const marker = showMarker(mapRef.current!, randomLatLng, catInfo.img.src);
+      const marker = showMarker(mapRef.current!, randomLatLng, cat.img.src);
 
       kakao.maps.event.addListener(marker, "click", () => {
-        setSelectedCat({ ...catInfo, marker });
+        setSelectedCat({ ...cat, marker });
 
         onClickCatMarker?.();
       });
@@ -171,11 +171,11 @@ export default function Map({ className, onClickCatMarker }: Props) {
         content: `<div class='cat-overlay'>
             <div class='name'>
               <span>이름 : </span>
-              <strong>${catInfo.name}</strong>
+              <strong>${cat.name}</strong>
             </div>
             <div class='description'>
               <span>소개 : </span>
-              <strong>${catInfo.description}</strong>
+              <strong>${cat.crying}</strong>
             </div>
           </div>`,
         position: marker.getPosition(),

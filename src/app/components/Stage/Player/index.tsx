@@ -25,7 +25,7 @@ function Introduce({ isMe, cat, introMotion, hp }: IntroduceProps) {
       </div>
       <div>
         <span>울음 : </span>
-        <strong>{cat?.description}</strong>
+        <strong>{cat?.crying}</strong>
       </div>
       <div>
         <span>HP : </span>

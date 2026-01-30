@@ -4,9 +4,8 @@ import classNames from "classnames/bind";
 import { useEffect, useState } from "react";
 
 import { useCatStore } from "@/app/store/cat";
-import { CatInfo } from "@/app/utils/cats";
+import { CatInfo, myCat } from "@/app/utils/cats";
 import { wait } from "@/app/utils/helper";
-import ImgCatMe from "@/assets/img/cat_me.png";
 
 import Dialog from "../Dialog";
 import Control from "./Control";
@@ -26,6 +25,8 @@ interface Props {
 
 export default function Stage({ onClose, onWin }: Props) {
   const selectedCat = useCatStore((s) => s.selectedCat);
+
+  const [me] = useState(myCat);
 
   const [hpInfo, setHpInfo] = useState({
     myHp: 10,
@@ -99,13 +100,7 @@ export default function Stage({ onClose, onWin }: Props) {
 
         <Player
           side="me"
-          cat={{
-            img: ImgCatMe,
-            description: "키야오오오",
-            hp: 10,
-            name: "나",
-            punchPower: 1,
-          }}
+          cat={me}
           hp={hpInfo.myHp}
           punched={hitInfo.myHit}
           punchDuraion={PUNCH_DURATION}

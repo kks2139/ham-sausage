@@ -11,7 +11,8 @@ import Dialog from "@/app/components/Dialog";
 import Map from "@/app/components/Map";
 import Stage from "@/app/components/Stage";
 import { useCatStore } from "@/app/store/cat";
-import { CatInfo, catInfos } from "@/app/utils/cats";
+import { catCharacters, CatInfo } from "@/app/utils/cats";
+import { getPostposition } from "@/app/utils/helper";
 import ImgWinningFlag from "@/assets/img/winning_flag.png";
 
 import styles from "./page.module.scss";
@@ -86,7 +87,7 @@ export default function FindCat() {
                 {selectedMenu === "catched" &&
                   (catchedCats.length > 0 ? (
                     <ul>
-                      {catchedCats.map(({ name, img, description }) => (
+                      {catchedCats.map(({ name, img, crying }) => (
                         <li key={name}>
                           <Image
                             src={img.src}
@@ -95,7 +96,7 @@ export default function FindCat() {
                             height={50}
                           />
                           <span>{name} :</span>
-                          <span>{description}</span>
+                          <span>{crying}</span>
                         </li>
                       ))}
                     </ul>
@@ -106,7 +107,7 @@ export default function FindCat() {
                   ))}
                 {selectedMenu === "all" && (
                   <ul>
-                    {catInfos.map(({ name, img, description }) => (
+                    {catCharacters.map(({ name, img, crying }) => (
                       <li key={name}>
                         <Image
                           src={img.src}
@@ -115,7 +116,7 @@ export default function FindCat() {
                           height={50}
                         />
                         <span>{name} :</span>
-                        <span>{description}</span>
+                        <span>{crying}</span>
                       </li>
                     ))}
                   </ul>
@@ -165,8 +166,12 @@ export default function FindCat() {
         title="승리"
         subTitle={
           <>
-            <strong>{catchedCat?.name}</strong>를 손에 넣었습니다.{"\n"}
-            이제 <strong>{catchedCat?.name}</strong>와 그의 영역은{"\n"}
+            <strong>{getPostposition(catchedCat?.name, "obj")}</strong> 손에
+            넣었습니다.{"\n"}
+            이제 <strong>
+              {getPostposition(catchedCat?.name, "with")}
+            </strong>{" "}
+            그의 영역은{"\n"}
             당신이 가지게 됩니다.
           </>
         }
