@@ -8,7 +8,7 @@ import { CatInfo, myCat } from "@/app/utils/cats";
 import { wait } from "@/app/utils/helper";
 
 import Dialog from "../Dialog";
-import Control from "./Control";
+import Control, { DialogInfo } from "./Control";
 import styles from "./index.module.scss";
 import Player from "./Player";
 
@@ -33,11 +33,14 @@ export default function Stage({ onClose, onWin }: Props) {
     enemyHp: selectedCat?.hp || 0,
   });
   const [hitInfo, setHitInfo] = useState({ myHit: false, enemyHit: false });
-  // const [temptInfo, setTemptInfo] = useState({
-  //   myTempted: false,
-  //   enemyTempted: false,
-  // });
 
+  const [dialogInfo, setDialogInfo] = useState<DialogInfo | undefined>({
+    type: "meet",
+    speaker: selectedCat?.name || "",
+    text: selectedCat?.dialog.meet || "",
+  });
+
+  const [dialogConfirmCount, setDialogConfirmCount] = useState(0);
   const [isShowControl, setIsShowControl] = useState(false);
   const [isShowDialog, setIsShowDialog] = useState(false);
   const [winner, setWinner] = useState<"me" | "enemy">();
@@ -49,7 +52,11 @@ export default function Stage({ onClose, onWin }: Props) {
     const isMyWin = enemyHp <= 0;
 
     if (isMyWin) {
-      setWinner("me");
+      setDialogInfo({
+        type: "win",
+        speaker: myCat.name,
+        text: myCat.dialog.win,
+      });
     }
 
     setHitInfo({ ...hitInfo, enemyHit: true });
@@ -58,16 +65,6 @@ export default function Stage({ onClose, onWin }: Props) {
     await wait((PUNCH_DURATION + 0.2) * 1000);
 
     setHpInfo({ ...hpInfo, enemyHp });
-
-    if (isMyWin) {
-      await wait(300);
-
-      setIsShowDialog(true);
-    }
-  };
-
-  const tepmt = () => {
-    //
   };
 
   useEffect(() => {
@@ -75,7 +72,7 @@ export default function Stage({ onClose, onWin }: Props) {
       () => setIsShowControl(true),
       (MY_MOTION_DURATION + MY_MOTION_DELAY + 0.3) * 1000
     );
-  }, [setIsShowControl]);
+  }, []);
 
   return (
     <div className={cn("Stage")}>
@@ -125,14 +122,90 @@ export default function Stage({ onClose, onWin }: Props) {
 
       <Control
         isShow={isShowControl}
-        onPunch={punch}
-        onTempt={tepmt}
+        onPunch={() => {
+          setDialogInfo({
+            type: "punch",
+            speaker: myCat.name,
+            text: myCat.dialog.punch,
+          });
+        }}
+        onSeduce={() => {
+          setDialogInfo({
+            type: "seduce",
+            speaker: myCat.name,
+            text: myCat.dialog.seduce,
+          });
+        }}
         onRun={() => onClose?.()}
+        dialogInfo={dialogInfo}
+        onConfirmDialog={async ({ type, side }) => {
+          if (dialogConfirmCount === 0) {
+            setDialogInfo({
+              type: "meet",
+              speaker: myCat.name,
+              text: myCat.dialog.meet,
+            });
+          } else if (dialogConfirmCount === 1) {
+            setDialogInfo(undefined);
+          } else {
+            setDialogInfo(undefined);
+            setIsShowControl(false);
+
+            if (side === "me") {
+              switch (type) {
+                case "punch":
+                  punch();
+                  break;
+                case "seduce":
+                  break;
+                case "taunt":
+                  break;
+                case "win":
+                  setWinner("me");
+
+                  setDialogInfo({
+                    side: "enemy",
+                    type: "lose",
+                    speaker: selectedCat!.name,
+                    text: selectedCat!.dialog.lose,
+                  });
+
+                  break;
+                case "lose":
+                  break;
+              }
+            } else if (side === "enemy") {
+              switch (type) {
+                case "punch":
+                  break;
+                case "seduce":
+                  break;
+                case "taunt":
+                  break;
+                case "win":
+                  break;
+                case "lose":
+                  setIsShowDialog(true);
+                  break;
+              }
+            }
+
+            const isEnd = type === "win" || type === "lose";
+
+            if (!isEnd) {
+              await wait(1000);
+            }
+
+            setIsShowControl(true);
+          }
+
+          setDialogConfirmCount((pre) => pre + 1);
+        }}
       />
 
       <Dialog
         isShow={isShowDialog}
-        title={isVictory ? "승리" : "패배배"}
+        title={isVictory ? "승리" : "패배"}
         subTitle={isVictory ? "적을 쓰러뜨렸습니다." : "패배하였습니다."}
         buttonLable={isVictory ? "좋은 싸움이었다" : "도망가자"}
         onButtonClick={() => {
