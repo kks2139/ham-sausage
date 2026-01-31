@@ -152,9 +152,11 @@ export default function FindCat() {
                     )
                   );
 
+                  cat.marker?.setTitle("catched");
+
                   setSelectedCat(undefined);
                   setCatchedCat(cat);
-                }, 1000);
+                }, 500);
               }}
             />
           </motion.div>

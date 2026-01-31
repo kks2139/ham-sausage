@@ -139,7 +139,14 @@ export default function Map({ className, onClickCatMarker }: Props) {
 
       const marker = showMarker(mapRef.current!, randomLatLng, cat.img.src);
 
+      // 이긴 상대인지 아닌지 알기위한 표시
+      marker.setTitle("active");
+
       kakao.maps.event.addListener(marker, "click", () => {
+        if (marker.getTitle() !== "active") {
+          return;
+        }
+
         setSelectedCat({ ...cat, marker });
 
         onClickCatMarker?.();

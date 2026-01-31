@@ -49,7 +49,7 @@ const Typing = ({ text, speed = 60 }: { text: string; speed?: number }) => {
 
 type DialogType = keyof CatInfo["dialog"];
 
-type Side = "me" | "enemy";
+export type Side = "me" | "enemy";
 
 export interface DialogInfo {
   side?: Side;
@@ -61,6 +61,7 @@ export interface DialogInfo {
 interface Props {
   isShow: boolean;
   onPunch: () => void;
+  onTaunt: () => void;
   onSeduce: () => void;
   onRun: () => void;
   dialogInfo?: DialogInfo;
@@ -70,6 +71,7 @@ interface Props {
 export default function Control({
   isShow,
   onPunch,
+  onTaunt,
   onSeduce,
   onRun,
   dialogInfo,
@@ -96,7 +98,7 @@ export default function Control({
               }}
             >
               <div className={cn("guide-text")}>click {"→"} 넘기기</div>
-              <div className={cn("speaker")}>{`[${dialogInfo.speaker}]`}</div>
+              <div className={cn("speaker")}>{`${dialogInfo.speaker}`}</div>
               <Typing text={dialogInfo.text} />
             </motion.div>
           ) : (
@@ -121,6 +123,16 @@ export default function Control({
                       }}
                     >
                       유혹
+                    </Button>
+                  </li>
+                  <li>
+                    <Button
+                      size="large"
+                      onClick={() => {
+                        onTaunt();
+                      }}
+                    >
+                      도발
                     </Button>
                   </li>
                   <li>

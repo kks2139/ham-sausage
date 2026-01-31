@@ -5,7 +5,7 @@ import Image from "next/image";
 
 import { CatInfo } from "@/app/utils/cats";
 
-import Effects from "../Effects";
+import Effects, { EffectType } from "../Effects";
 import styles from "./index.module.scss";
 
 const cn = classNames.bind(styles);
@@ -46,22 +46,26 @@ function Introduce({ isMe, cat, introMotion, hp }: IntroduceProps) {
 
 interface CatVisualProps {
   cat?: CatInfo;
-  punched?: boolean;
+  effectType?: EffectType;
   punchDuraion?: number;
+  seduceDuraion?: number;
   catImgIntroMotion?: MotionNodeAnimationOptions;
   children?: React.ReactNode;
 }
 
 function CatVisual({
   cat,
-  punched,
+  effectType,
   catImgIntroMotion,
   children,
 }: CatVisualProps) {
   return (
     <motion.div className={cn("imgs")} {...catImgIntroMotion}>
       <Image
-        className={cn("cat-img", { hit: punched })}
+        className={cn("cat-img", {
+          hit: effectType === "punch",
+          shake: effectType === "seduce",
+        })}
         src={cat?.img.src || ""}
         alt={cat?.name || ""}
         width={100}
@@ -81,8 +85,9 @@ export default function Player({
   cat,
   hp,
   introMotion,
-  punched,
   punchDuraion = 1,
+  seduceDuraion = 1,
+  effectType,
   catImgIntroMotion,
 }: Props) {
   const isMe = side === "me";
@@ -93,14 +98,16 @@ export default function Player({
 
       <CatVisual
         cat={cat}
-        punched={punched}
+        effectType={effectType}
         punchDuraion={punchDuraion}
+        seduceDuraion={seduceDuraion}
         catImgIntroMotion={catImgIntroMotion}
       >
         <Effects
-          enabled={!!punched}
-          effectType="punch"
-          effectDuration={punchDuraion}
+          side={side}
+          enabled={!!effectType}
+          effectType={effectType}
+          punchDuration={punchDuraion}
         />
       </CatVisual>
 

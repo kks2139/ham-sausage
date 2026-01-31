@@ -59,17 +59,15 @@
 
     .cat-img {
       &.hit {
-        animation: shake 0.5s;
+        animation: hit 0.5s;
+      }
+
+      &.shake {
+        animation: shake 2s;
       }
     }
 
-    .punch-img {
-      position: absolute;
-      bottom: -20px;
-      transform: rotate(45deg);
-    }
-
-    @keyframes shake {
+    @keyframes hit {
       0% {
         transform: translateX(0);
       }
@@ -78,6 +76,21 @@
       }
       66% {
         transform: translateX(10px);
+      }
+      100% {
+        transform: translateX(0);
+      }
+    }
+
+    @keyframes shake {
+      0% {
+        transform: rotate(0);
+      }
+      33% {
+        transform: rotate(45deg);
+      }
+      66% {
+        transform: translateX(-45deg);
       }
       100% {
         transform: translateX(0);

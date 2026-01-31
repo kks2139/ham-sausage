@@ -2,27 +2,29 @@ import classNames from "classnames/bind";
 import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
 
-import ImgCatFood from "@/assets/img/cat_food.png";
 import ImgCatFoot from "@/assets/img/cat_foot.png";
+import ImgHeart from "@/assets/img/heart.png";
 
 import styles from "./index.module.scss";
 
 const cn = classNames.bind(styles);
 
-export type EffectType = "punch" | "tempt";
+export type EffectType = "punch" | "seduce" | "tempt";
 
 interface Props {
   className?: string;
-  effectType: EffectType;
-  effectDuration: number;
+  effectType?: EffectType;
+  punchDuration: number;
   enabled: boolean;
+  side?: "me" | "enemy";
 }
 
 export default function Effects({
   className,
   effectType,
-  effectDuration,
+  punchDuration,
   enabled,
+  side,
 }: Props) {
   return (
     <AnimatePresence>
@@ -38,7 +40,7 @@ export default function Effects({
               initial={{ opacity: 0, x: isFirst ? -moveX : 0 }}
               animate={{ opacity: 1, x: isFirst ? 0 : moveX }}
               transition={{
-                duration: effectDuration,
+                duration: punchDuration,
                 delay: isFirst ? 0 : 0.2,
               }}
             >
@@ -53,14 +55,14 @@ export default function Effects({
           );
         })}
 
-      {effectType === "tempt" && enabled && (
+      {effectType === "seduce" && enabled && (
         <div className={cn(className)}>
           <Image
-            className={cn("punch-img", className)}
-            src={ImgCatFood.src}
+            className={cn("heart-img", className, { enemy: side === "enemy" })}
+            src={ImgHeart.src}
             alt=""
             width={30}
-            height={60}
+            height={30}
           />
         </div>
       )}
