@@ -107,16 +107,6 @@ export default function Stage({ onClose, onWin }: Props) {
     const action = Math.floor(Math.random() * 10) % 3;
     const side = "enemy";
 
-    setDialogInfo({
-      side,
-      type: "seduce",
-      speaker: selectedCat!.name,
-      text: selectedCat!.dialog.seduce,
-    });
-    setIsShowControl(true);
-
-    return;
-
     switch (action) {
       case 0: // 냥냥펀치
         setDialogInfo({
