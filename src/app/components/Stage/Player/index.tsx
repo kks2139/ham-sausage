@@ -5,7 +5,7 @@ import Image from "next/image";
 
 import { CatInfo } from "@/app/utils/cats";
 
-import Effects, { EffectType } from "../Effects";
+import { EffectType } from "../Effects";
 import styles from "./index.module.scss";
 
 const cn = classNames.bind(styles);
@@ -37,8 +37,11 @@ function Introduce({ isMe, cat, introMotion, hp }: IntroduceProps) {
               width: `${(hp / (cat?.hp || 0)) * 100}%`,
             }}
           ></div>
+          <div className={cn("value")}>
+            <NumberFlow value={hp} />
+            {` / ${cat?.hp}`}
+          </div>
         </div>
-        <NumberFlow className={cn("value")} value={hp} />
       </li>
     </motion.ul>
   );
@@ -64,7 +67,6 @@ function CatVisual({
       <Image
         className={cn("cat-img", {
           hit: effectType === "punch",
-          shake: effectType === "seduce",
         })}
         src={cat?.img.src || ""}
         alt={cat?.name || ""}
@@ -78,6 +80,7 @@ function CatVisual({
 
 interface Props extends IntroduceProps, CatVisualProps {
   side: "me" | "enemy";
+  children?: React.ReactNode;
 }
 
 export default function Player({
@@ -89,27 +92,24 @@ export default function Player({
   seduceDuraion = 1,
   effectType,
   catImgIntroMotion,
+  children,
 }: Props) {
   const isMe = side === "me";
 
   return (
-    <div className={cn("Player", { "align-right": !isMe })}>
+    <div className={cn("Player")}>
       {!isMe && <Introduce cat={cat} hp={hp} introMotion={introMotion} />}
 
-      <CatVisual
-        cat={cat}
-        effectType={effectType}
-        punchDuraion={punchDuraion}
-        seduceDuraion={seduceDuraion}
-        catImgIntroMotion={catImgIntroMotion}
-      >
-        <Effects
-          side={side}
-          enabled={!!effectType}
+      <div className={cn("cat")}>
+        <CatVisual
+          cat={cat}
           effectType={effectType}
-          punchDuration={punchDuraion}
+          punchDuraion={punchDuraion}
+          seduceDuraion={seduceDuraion}
+          catImgIntroMotion={catImgIntroMotion}
         />
-      </CatVisual>
+        {children}
+      </div>
 
       {isMe && <Introduce isMe cat={cat} hp={hp} introMotion={introMotion} />}
     </div>

@@ -5,26 +5,25 @@ import Image from "next/image";
 import ImgCatFoot from "@/assets/img/cat_foot.png";
 import ImgHeart from "@/assets/img/heart.png";
 
+import { Side } from "../Control";
 import styles from "./index.module.scss";
 
 const cn = classNames.bind(styles);
 
-export type EffectType = "punch" | "seduce" | "tempt";
+export type EffectType = "punch" | "seduce" | "provoke";
 
 interface Props {
-  className?: string;
   effectType?: EffectType;
   punchDuration: number;
   enabled: boolean;
-  side?: "me" | "enemy";
+  target?: Side;
 }
 
 export default function Effects({
-  className,
   effectType,
   punchDuration,
   enabled,
-  side,
+  target = "me",
 }: Props) {
   return (
     <AnimatePresence>
@@ -36,6 +35,7 @@ export default function Effects({
 
           return (
             <motion.div
+              className={cn("punch", { [target]: true })}
               key={i}
               initial={{ opacity: 0, x: isFirst ? -moveX : 0 }}
               animate={{ opacity: 1, x: isFirst ? 0 : moveX }}
@@ -44,26 +44,14 @@ export default function Effects({
                 delay: isFirst ? 0 : 0.2,
               }}
             >
-              <Image
-                className={cn("punch-img", className)}
-                src={ImgCatFoot.src}
-                alt=""
-                width={30}
-                height={60}
-              />
+              <Image src={ImgCatFoot.src} alt="" width={30} height={60} />
             </motion.div>
           );
         })}
 
       {effectType === "seduce" && enabled && (
-        <div className={cn(className)}>
-          <Image
-            className={cn("heart-img", className, { enemy: side === "enemy" })}
-            src={ImgHeart.src}
-            alt=""
-            width={30}
-            height={30}
-          />
+        <div className={cn("seduce", { [target]: true })}>
+          <Image src={ImgHeart.src} alt="" width={50} height={50} />
         </div>
       )}
     </AnimatePresence>

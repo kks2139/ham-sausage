@@ -1,21 +1,22 @@
-.punch-img {
+.punch {
   position: absolute;
   bottom: 20px;
-  transform: rotate(45deg);
+
+  img {
+    transform: rotate(45deg);
+  }
 }
 
-.heart-img {
+.seduce {
   position: absolute;
   top: 0;
-  left: 100%;
   animation: verticalWave 0.5s ease-in-out infinite,
-    horizontalMove 2s linear infinite;
+    horizontalMove 3s linear infinite;
 
   &.enemy {
     top: 100%;
-    left: -20px;
     animation: verticalWave 0.5s ease-in-out infinite,
-      horizontalMoveEnemy 2s linear infinite;
+      horizontalMoveEnemy 3s linear infinite;
   }
 
   @keyframes verticalWave {
@@ -33,16 +34,16 @@
       left: 100%;
     }
     100% {
-      left: 300%;
+      left: 85vw;
     }
   }
 
   @keyframes horizontalMoveEnemy {
     0% {
-      left: -20px;
+      left: 0;
     }
     100% {
-      left: -300%;
+      left: -60vh;
     }
   }
 }

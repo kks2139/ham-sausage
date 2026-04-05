@@ -61,21 +61,21 @@ export interface DialogInfo {
 interface Props {
   isShow: boolean;
   onPunch: () => void;
-  onTaunt: () => void;
+  onProvoke: () => void;
   onSeduce: () => void;
   onRun: () => void;
   dialogInfo?: DialogInfo;
-  onConfirmDialog: (info: { type?: DialogType; side: Side }) => void;
+  onDialogConfirmClick: (info: { type?: DialogType; causedBy: Side }) => void;
 }
 
 export default function Control({
   isShow,
   onPunch,
-  onTaunt,
+  onProvoke,
   onSeduce,
   onRun,
   dialogInfo,
-  onConfirmDialog,
+  onDialogConfirmClick,
 }: Props) {
   const { addToastMessage } = useViewStore((s) => s.actions);
 
@@ -91,9 +91,9 @@ export default function Control({
               {...MOTION_DATA}
               className={cn("dialog")}
               onClick={() => {
-                onConfirmDialog({
+                onDialogConfirmClick({
                   type: dialogInfo.type,
-                  side: dialogInfo.side || "me",
+                  causedBy: dialogInfo.side || "me",
                 });
               }}
             >
@@ -129,7 +129,7 @@ export default function Control({
                     <Button
                       size="large"
                       onClick={() => {
-                        onTaunt();
+                        onProvoke();
                       }}
                     >
                       도발

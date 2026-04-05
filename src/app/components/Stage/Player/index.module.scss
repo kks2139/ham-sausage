@@ -3,10 +3,7 @@
   display: flex;
   column-gap: 15px;
   color: white;
-
-  &.align-right {
-    justify-content: flex-end;
-  }
+  justify-content: space-between;
 
   .introduce {
     font-size: 15px;
@@ -24,7 +21,6 @@
 
     .label {
       width: 40px;
-      // box-shadow: 0 0 0 1px red;
     }
 
     strong {
@@ -34,11 +30,10 @@
 
     .hp {
       .hp-bar {
-        width: 140px;
-        height: 10px;
+        width: 100px;
+        height: 6px;
         border-radius: 8px;
-        box-shadow: 0 0 0 2px white;
-        margin-left: 2px;
+        box-shadow: 0 0 0 1px white;
 
         .bar {
           height: 100%;
@@ -49,9 +44,16 @@
       }
 
       .value {
-        margin-left: 10px;
+        display: flex;
+        justify-content: center;
+        margin-top: 3px;
+        font-size: 13px;
       }
     }
+  }
+
+  .cat {
+    position: relative;
   }
 
   .imgs {
@@ -60,10 +62,6 @@
     .cat-img {
       &.hit {
         animation: hit 0.5s;
-      }
-
-      &.shake {
-        animation: shake 2s;
       }
     }
 
@@ -76,21 +74,6 @@
       }
       66% {
         transform: translateX(10px);
-      }
-      100% {
-        transform: translateX(0);
-      }
-    }
-
-    @keyframes shake {
-      0% {
-        transform: rotate(0);
-      }
-      33% {
-        transform: rotate(45deg);
-      }
-      66% {
-        transform: translateX(-45deg);
       }
       100% {
         transform: translateX(0);

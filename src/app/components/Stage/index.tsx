@@ -9,15 +9,20 @@ import { wait } from "@/app/utils/helper";
 
 import Dialog from "../Dialog";
 import Control, { DialogInfo, Side } from "./Control";
+import Effects, { EffectType } from "./Effects";
 import styles from "./index.module.scss";
 import Player from "./Player";
 
 const cn = classNames.bind(styles);
 
+// 모션 duration(초) 정의
 const MY_MOTION_DELAY = 1;
 const MY_MOTION_DURATION = 0.2;
 const PUNCH_DURATION = 0.2;
 const SEDUCE_DURATION = 2;
+const PROVOKE_DURATION = 1;
+// 행동 후 딜레이
+const DELAY_OF_ACTIONS = 0.5;
 
 interface Props {
   onClose?: () => void;
@@ -29,16 +34,6 @@ export default function Stage({ onClose, onWin }: Props) {
 
   const [me] = useState(myCat);
 
-  const [hpInfo, setHpInfo] = useState({
-    myHp: myCat.hp,
-    enemyHp: selectedCat?.hp || 0,
-  });
-  const [hitInfo, setHitInfo] = useState({ myHit: false, enemyHit: false });
-  const [seduceInfo, setSeduceInfo] = useState({
-    mySeduce: false,
-    enemySeduce: false,
-  });
-
   const [dialogInfo, setDialogInfo] = useState<DialogInfo | undefined>({
     type: "meet",
     speaker: selectedCat?.name || "",
@@ -49,6 +44,33 @@ export default function Stage({ onClose, onWin }: Props) {
   const [isShowControl, setIsShowControl] = useState(false);
   const [isShowFinishPopup, setIsShowFinishPopup] = useState(false);
   const [winner, setWinner] = useState<Side>();
+
+  // 전투진행관련 상태들
+  const [hpInfo, setHpInfo] = useState({
+    myHp: myCat.hp,
+    enemyHp: selectedCat?.hp || 0,
+  });
+  const [punchedBy, setPunchedBy] = useState<Side>();
+  const [seducedBy, setSeducedBy] = useState<Side>();
+  const [provokedBy, setProvokedBy] = useState<Side>();
+
+  const enemyEffect: EffectType | undefined =
+    provokedBy === "me"
+      ? "provoke"
+      : seducedBy === "me"
+      ? "seduce"
+      : punchedBy === "me"
+      ? "punch"
+      : undefined;
+
+  const myEffect: EffectType | undefined =
+    provokedBy === "enemy"
+      ? "provoke"
+      : seducedBy === "enemy"
+      ? "seduce"
+      : punchedBy === "enemy"
+      ? "punch"
+      : undefined;
 
   const isVictory = !!winner && winner === "me";
 
@@ -63,10 +85,10 @@ export default function Stage({ onClose, onWin }: Props) {
         winnerSide = "me";
       }
 
-      setHitInfo({ ...hitInfo, enemyHit: true });
-      setTimeout(() => setHitInfo({ ...hitInfo, enemyHit: false }), 1000);
+      setPunchedBy("me");
+      setTimeout(() => setPunchedBy(undefined), 1000);
 
-      await wait((PUNCH_DURATION + 0.2) * 1000);
+      await wait((PUNCH_DURATION + DELAY_OF_ACTIONS) * 1000);
 
       setHpInfo({ ...hpInfo, enemyHp });
     } else {
@@ -76,10 +98,10 @@ export default function Stage({ onClose, onWin }: Props) {
         winnerSide = "enemy";
       }
 
-      setHitInfo({ ...hitInfo, myHit: true });
-      setTimeout(() => setHitInfo({ ...hitInfo, myHit: false }), 1000);
+      setPunchedBy("enemy");
+      setTimeout(() => setPunchedBy(undefined), 1000);
 
-      await wait((PUNCH_DURATION + 0.2) * 1000);
+      await wait((PUNCH_DURATION + DELAY_OF_ACTIONS) * 1000);
 
       setHpInfo({ ...hpInfo, myHp });
     }
@@ -89,21 +111,30 @@ export default function Stage({ onClose, onWin }: Props) {
 
   const seduce = async (side: Side) => {
     if (side === "me") {
-      setSeduceInfo({ ...seduceInfo, enemySeduce: true });
-      setTimeout(
-        () => setSeduceInfo({ ...seduceInfo, enemySeduce: false }),
-        1000
-      );
+      setSeducedBy("enemy");
+      setTimeout(() => setSeducedBy(undefined), SEDUCE_DURATION * 1000);
     } else {
-      setSeduceInfo({ ...seduceInfo, mySeduce: true });
-      setTimeout(() => setSeduceInfo({ ...seduceInfo, mySeduce: false }), 1000);
+      setSeducedBy("me");
+      setTimeout(() => setSeducedBy(undefined), SEDUCE_DURATION * 1000);
     }
 
-    await wait((SEDUCE_DURATION + 0.2) * 1000);
+    await wait((SEDUCE_DURATION + DELAY_OF_ACTIONS) * 1000);
+  };
+
+  const provoke = async (side: Side) => {
+    if (side === "me") {
+      setProvokedBy("enemy");
+      setTimeout(() => setProvokedBy(undefined), PROVOKE_DURATION * 1000);
+    } else {
+      setProvokedBy("me");
+      setTimeout(() => setProvokedBy(undefined), PROVOKE_DURATION * 1000);
+    }
+
+    await wait((PROVOKE_DURATION + DELAY_OF_ACTIONS) * 1000);
   };
 
   const enemyAction = () => {
-    // 적은 랜덤 확률로 액션을 취한다
+    // 상대는 랜덤으로 액션을 취한다
     const action = Math.floor(Math.random() * 10) % 3;
     const side = "enemy";
 
@@ -119,9 +150,9 @@ export default function Stage({ onClose, onWin }: Props) {
       case 1: // 도발
         setDialogInfo({
           side,
-          type: "taunt",
+          type: "provoke",
           speaker: selectedCat!.name,
-          text: selectedCat!.dialog.taunt,
+          text: selectedCat!.dialog.provoke,
         });
         break;
       case 2: // 유혹
@@ -151,13 +182,7 @@ export default function Stage({ onClose, onWin }: Props) {
           side="enemy"
           cat={selectedCat}
           hp={hpInfo.enemyHp}
-          effectType={
-            seduceInfo.enemySeduce
-              ? "seduce"
-              : hitInfo.enemyHit
-              ? "punch"
-              : undefined
-          }
+          effectType={enemyEffect}
           punchDuraion={PUNCH_DURATION}
           seduceDuraion={SEDUCE_DURATION}
           introMotion={{
@@ -170,15 +195,20 @@ export default function Stage({ onClose, onWin }: Props) {
             animate: { opacity: 1, x: 0 },
             transition: { duration: 0.3, delay: 0.2 },
           }}
-        />
+        >
+          <Effects
+            target="enemy"
+            enabled={!!enemyEffect}
+            effectType={enemyEffect}
+            punchDuration={PUNCH_DURATION}
+          />
+        </Player>
 
         <Player
           side="me"
           cat={me}
           hp={hpInfo.myHp}
-          effectType={
-            seduceInfo.mySeduce ? "seduce" : hitInfo.myHit ? "punch" : undefined
-          }
+          effectType={myEffect}
           punchDuraion={PUNCH_DURATION}
           seduceDuraion={SEDUCE_DURATION}
           catImgIntroMotion={{
@@ -197,11 +227,18 @@ export default function Stage({ onClose, onWin }: Props) {
               delay: MY_MOTION_DURATION + MY_MOTION_DELAY,
             },
           }}
-        />
+        >
+          <Effects
+            enabled={!!myEffect}
+            effectType={myEffect}
+            punchDuration={PUNCH_DURATION}
+          />
+        </Player>
       </div>
 
       <Control
         isShow={isShowControl}
+        dialogInfo={dialogInfo}
         onPunch={() => {
           setDialogInfo({
             type: "punch",
@@ -209,11 +246,11 @@ export default function Stage({ onClose, onWin }: Props) {
             text: myCat.dialog.punch,
           });
         }}
-        onTaunt={() => {
+        onProvoke={() => {
           setDialogInfo({
-            type: "taunt",
+            type: "provoke",
             speaker: myCat.name,
-            text: myCat.dialog.taunt,
+            text: myCat.dialog.provoke,
           });
         }}
         onSeduce={() => {
@@ -223,9 +260,16 @@ export default function Stage({ onClose, onWin }: Props) {
             text: myCat.dialog.seduce,
           });
         }}
-        onRun={() => onClose?.()}
-        dialogInfo={dialogInfo}
-        onConfirmDialog={async ({ type, side }) => {
+        onRun={() => {
+          setDialogInfo({
+            type: "run",
+            speaker: myCat.name,
+            text: myCat.dialog.run,
+          });
+        }}
+        onDialogConfirmClick={async ({ type, causedBy }) => {
+          // 대화상자 클릭 후 할것들 정의
+
           if (dialogConfirmCount === 0) {
             setDialogInfo({
               type: "meet",
@@ -238,12 +282,10 @@ export default function Stage({ onClose, onWin }: Props) {
             setDialogInfo(undefined);
             setIsShowControl(false);
 
-            if (side === "me") {
+            if (causedBy === "me") {
               switch (type) {
                 case "punch":
                   const winner = await punch("me");
-
-                  await wait(1000);
 
                   if (winner === "me") {
                     setDialogInfo({
@@ -263,13 +305,13 @@ export default function Stage({ onClose, onWin }: Props) {
                   }
 
                   break;
-                case "taunt":
-                  setIsShowControl(true);
+                case "provoke":
+                  await provoke("me");
+
+                  enemyAction();
                   break;
                 case "seduce":
-                  seduce("me");
-
-                  await wait(1500);
+                  await seduce("me");
 
                   enemyAction();
 
@@ -283,25 +325,40 @@ export default function Stage({ onClose, onWin }: Props) {
                     speaker: selectedCat!.name,
                     text: selectedCat!.dialog.lose,
                   });
+
                   break;
                 case "lose":
                   setIsShowFinishPopup(true);
+                  break;
+                case "run":
+                  setDialogInfo({
+                    side: "enemy",
+                    type: "run",
+                    speaker: selectedCat!.name,
+                    text: selectedCat!.dialog.run,
+                  });
+
                   break;
               }
 
               if (type !== "lose") {
                 setIsShowControl(true);
               }
-            } else if (side === "enemy") {
+            }
+
+            if (causedBy === "enemy") {
               switch (type) {
                 case "punch":
-                  punch("enemy");
-                  break;
-                case "seduce":
-                  seduce("enemy");
+                  await punch("enemy");
 
                   break;
-                case "taunt":
+                case "seduce":
+                  await seduce("enemy");
+
+                  break;
+                case "provoke":
+                  await provoke("enemy");
+
                   break;
                 case "win":
                   setWinner("enemy");
@@ -316,9 +373,10 @@ export default function Stage({ onClose, onWin }: Props) {
                 case "lose":
                   setIsShowFinishPopup(true);
                   break;
+                case "run":
+                  onClose?.();
+                  break;
               }
-
-              await wait(1000);
 
               if (type !== "lose") {
                 setIsShowControl(true);
