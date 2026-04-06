@@ -2,10 +2,11 @@
 
 import classNames from "classnames/bind";
 import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { useViewStore } from "@/app/store/view";
 import { CatInfo } from "@/app/utils/cats";
+import { getRandomNumber } from "@/app/utils/helper";
 
 import Button from "../../Button";
 import styles from "./index.module.scss";
@@ -55,7 +56,7 @@ export interface DialogInfo {
   side?: Side;
   type: DialogType;
   speaker: string;
-  text: string;
+  text: string | string[];
 }
 
 interface Props {
@@ -81,6 +82,16 @@ export default function Control({
 
   const [menuType, setMenuType] = useState<"default" | "battle">();
 
+  const content = useMemo(() => {
+    if (Array.isArray(dialogInfo?.text)) {
+      const index = getRandomNumber(dialogInfo.text.length);
+
+      return dialogInfo.text[index];
+    }
+
+    return dialogInfo?.text || "";
+  }, [dialogInfo?.text]);
+
   return (
     <div className={cn("Control")}>
       <AnimatePresence>
@@ -99,7 +110,7 @@ export default function Control({
             >
               <div className={cn("guide-text")}>click {"→"} 넘기기</div>
               <div className={cn("speaker")}>{`${dialogInfo.speaker}`}</div>
-              <Typing text={dialogInfo.text} />
+              <Typing text={content} />
             </motion.div>
           ) : (
             <div className={cn("menu")}>

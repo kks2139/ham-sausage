@@ -33,3 +33,6 @@ export const getRandomLocation = (
   const lng_diff = (Math.random() - 0.5) * 2 * (radiusInMeters / 88000);
   return new kakao.maps.LatLng(lat + lat_diff, lng + lng_diff);
 };
+
+export const getRandomNumber = (maxNum: number) =>
+  Math.floor(Math.random() * maxNum);

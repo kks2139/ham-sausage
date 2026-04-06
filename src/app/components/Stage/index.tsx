@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 
 import { useCatStore } from "@/app/store/cat";
 import { CatInfo, myCat } from "@/app/utils/cats";
-import { wait } from "@/app/utils/helper";
+import { getRandomNumber, wait } from "@/app/utils/helper";
 
 import Dialog from "../Dialog";
 import Control, { DialogInfo, Side } from "./Control";
@@ -77,6 +77,7 @@ export default function Stage({ onClose, onWin }: Props) {
   // return: 승리한 사이드
   const punch = async (side: Side): Promise<Side | void> => {
     let winnerSide: Side | undefined;
+    const actionDelay = (PUNCH_DURATION + DELAY_OF_ACTIONS) * 1000;
 
     if (side === "me") {
       const enemyHp = Math.max(hpInfo.enemyHp - myCat.punchPower, 0);
@@ -88,7 +89,7 @@ export default function Stage({ onClose, onWin }: Props) {
       setPunchedBy("me");
       setTimeout(() => setPunchedBy(undefined), 1000);
 
-      await wait((PUNCH_DURATION + DELAY_OF_ACTIONS) * 1000);
+      await wait(actionDelay);
 
       setHpInfo({ ...hpInfo, enemyHp });
     } else {
@@ -101,10 +102,13 @@ export default function Stage({ onClose, onWin }: Props) {
       setPunchedBy("enemy");
       setTimeout(() => setPunchedBy(undefined), 1000);
 
-      await wait((PUNCH_DURATION + DELAY_OF_ACTIONS) * 1000);
+      await wait(actionDelay);
 
       setHpInfo({ ...hpInfo, myHp });
     }
+
+    // hp감소 효과 대기
+    await wait(2000);
 
     return winnerSide;
   };
@@ -135,11 +139,22 @@ export default function Stage({ onClose, onWin }: Props) {
 
   const enemyAction = () => {
     // 상대는 랜덤으로 액션을 취한다
-    const action = Math.floor(Math.random() * 10) % 3;
+    const action = getRandomNumber(5);
     const side = "enemy";
 
+    setDialogInfo({
+      side,
+      type: "punch",
+      speaker: selectedCat!.name,
+      text: selectedCat!.dialog.punch,
+    });
+    return;
+
     switch (action) {
-      case 0: // 냥냥펀치
+      // 냥냥펀치
+      case 0:
+      case 1:
+      case 2:
         setDialogInfo({
           side,
           type: "punch",
@@ -147,7 +162,7 @@ export default function Stage({ onClose, onWin }: Props) {
           text: selectedCat!.dialog.punch,
         });
         break;
-      case 1: // 도발
+      case 3: // 도발
         setDialogInfo({
           side,
           type: "provoke",
@@ -155,7 +170,7 @@ export default function Stage({ onClose, onWin }: Props) {
           text: selectedCat!.dialog.provoke,
         });
         break;
-      case 2: // 유혹
+      case 4: // 유혹
         setDialogInfo({
           side,
           type: "seduce",
@@ -267,9 +282,8 @@ export default function Stage({ onClose, onWin }: Props) {
             text: myCat.dialog.run,
           });
         }}
+        // 대화상자 클릭 후 액션 정의
         onDialogConfirmClick={async ({ type, causedBy }) => {
-          // 대화상자 클릭 후 할것들 정의
-
           if (dialogConfirmCount === 0) {
             setDialogInfo({
               type: "meet",
@@ -292,13 +306,6 @@ export default function Stage({ onClose, onWin }: Props) {
                       type: "win",
                       speaker: myCat.name,
                       text: myCat.dialog.win,
-                    });
-                  } else if (winner === "enemy") {
-                    setDialogInfo({
-                      side: "enemy",
-                      type: "win",
-                      speaker: selectedCat!.name,
-                      text: selectedCat!.dialog.win,
                     });
                   } else {
                     enemyAction();
@@ -349,7 +356,16 @@ export default function Stage({ onClose, onWin }: Props) {
             if (causedBy === "enemy") {
               switch (type) {
                 case "punch":
-                  await punch("enemy");
+                  const winner = await punch("enemy");
+
+                  if (winner === "enemy") {
+                    setDialogInfo({
+                      side: "enemy",
+                      type: "win",
+                      speaker: selectedCat!.name,
+                      text: selectedCat!.dialog.win,
+                    });
+                  }
 
                   break;
                 case "seduce":

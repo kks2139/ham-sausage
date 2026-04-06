@@ -1,51 +1,15 @@
-import NumberFlow from "@number-flow/react";
 import classNames from "classnames/bind";
 import { motion, MotionNodeAnimationOptions } from "framer-motion";
 import Image from "next/image";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { CatInfo } from "@/app/utils/cats";
 
 import { EffectType } from "../Effects";
 import styles from "./index.module.scss";
+import { Status, StatusProps } from "./Status";
 
 const cn = classNames.bind(styles);
-
-interface IntroduceProps {
-  isMe?: boolean;
-  cat?: CatInfo;
-  introMotion?: MotionNodeAnimationOptions;
-  hp: number;
-}
-
-function Introduce({ isMe, cat, introMotion, hp }: IntroduceProps) {
-  return (
-    <motion.ul className={cn("introduce", { me: isMe })} {...introMotion}>
-      <li>
-        <div className={cn("label")}>이름</div>
-        <strong>{cat?.name}</strong>
-      </li>
-      <li>
-        <div className={cn("label")}>울음</div>
-        <strong>{cat?.crying}</strong>
-      </li>
-      <li className={cn("hp")}>
-        <div className={cn("label")}>HP</div>
-        <div className={cn("hp-bar")}>
-          <div
-            className={cn("bar")}
-            style={{
-              width: `${(hp / (cat?.hp || 0)) * 100}%`,
-            }}
-          ></div>
-          <div className={cn("value")}>
-            <NumberFlow value={hp} />
-            {` / ${cat?.hp}`}
-          </div>
-        </div>
-      </li>
-    </motion.ul>
-  );
-}
 
 interface CatVisualProps {
   cat?: CatInfo;
@@ -78,7 +42,7 @@ function CatVisual({
   );
 }
 
-interface Props extends IntroduceProps, CatVisualProps {
+interface Props extends StatusProps, CatVisualProps {
   side: "me" | "enemy";
   children?: React.ReactNode;
 }
@@ -94,11 +58,33 @@ export default function Player({
   catImgIntroMotion,
   children,
 }: Props) {
+  const [hpEffect, setHpEffect] = useState<StatusProps["hpEffect"]>();
+  const prevHp = useRef(hp);
+
   const isMe = side === "me";
+
+  const status = useMemo(
+    () => (
+      <Status cat={cat} hp={hp} introMotion={introMotion} hpEffect={hpEffect} />
+    ),
+    [cat, hp, hpEffect, introMotion]
+  );
+
+  useEffect(() => {
+    if (prevHp.current === hp) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setHpEffect(undefined);
+    } else {
+      setHpEffect(prevHp.current < hp ? "up" : "down");
+      setTimeout(() => setHpEffect(undefined), 1000);
+    }
+
+    prevHp.current = hp;
+  }, [hp]);
 
   return (
     <div className={cn("Player")}>
-      {!isMe && <Introduce cat={cat} hp={hp} introMotion={introMotion} />}
+      {!isMe && status}
 
       <div className={cn("cat")}>
         <CatVisual
@@ -111,7 +97,7 @@ export default function Player({
         {children}
       </div>
 
-      {isMe && <Introduce isMe cat={cat} hp={hp} introMotion={introMotion} />}
+      {isMe && status}
     </div>
   );
 }
