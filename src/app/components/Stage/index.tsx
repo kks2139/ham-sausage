@@ -35,6 +35,7 @@ export default function Stage({ onClose, onWin }: Props) {
   const [me] = useState(myCat);
 
   const [dialogInfo, setDialogInfo] = useState<DialogInfo | undefined>({
+    side: "enemy",
     type: "meet",
     speaker: selectedCat?.name || "",
     text: selectedCat?.dialog.meet || "",
@@ -187,6 +188,7 @@ export default function Stage({ onClose, onWin }: Props) {
       (MY_MOTION_DURATION + MY_MOTION_DELAY + 0.3) * 1000
     );
   }, []);
+  console.log(11, dialogInfo);
 
   return (
     <div className={cn("Stage")}>
@@ -209,6 +211,7 @@ export default function Stage({ onClose, onWin }: Props) {
             animate: { opacity: 1, x: 0 },
             transition: { duration: 0.3, delay: 0.2 },
           }}
+          isSpeaking={dialogInfo?.side === "enemy"}
         >
           <Effects
             target="enemy"
@@ -242,6 +245,7 @@ export default function Stage({ onClose, onWin }: Props) {
               delay: MY_MOTION_DURATION + MY_MOTION_DELAY,
             },
           }}
+          isSpeaking={dialogInfo && dialogInfo.side === undefined}
         >
           <Effects
             enabled={!!myEffect}

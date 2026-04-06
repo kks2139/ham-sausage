@@ -29,7 +29,9 @@ function CatVisual({
   return (
     <motion.div {...catImgIntroMotion}>
       <Image
-        className={cn("cat-img", { [effectType || ""]: true })}
+        className={cn("cat-img", {
+          [effectType || ""]: true,
+        })}
         src={cat?.img.src || ""}
         alt={cat?.name || ""}
         width={100}
@@ -42,6 +44,7 @@ function CatVisual({
 
 interface Props extends StatusProps, CatVisualProps {
   side: "me" | "enemy";
+  isSpeaking?: boolean;
   children?: React.ReactNode;
 }
 
@@ -55,6 +58,7 @@ export default function Player({
   catImgIntroMotion,
   children,
   side,
+  isSpeaking,
 }: Props) {
   const [hpEffect, setHpEffect] = useState<StatusProps["hpEffect"]>();
   const prevHp = useRef(hp);
@@ -84,7 +88,7 @@ export default function Player({
     <div className={cn("Player")}>
       {!isMe && status}
 
-      <div className={cn("cat")}>
+      <div className={cn("cat", { speaking: isSpeaking })}>
         <CatVisual
           cat={cat}
           effectType={effectType}
