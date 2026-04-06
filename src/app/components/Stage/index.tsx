@@ -188,7 +188,6 @@ export default function Stage({ onClose, onWin }: Props) {
       (MY_MOTION_DURATION + MY_MOTION_DELAY + 0.3) * 1000
     );
   }, []);
-  console.log(11, dialogInfo);
 
   return (
     <div className={cn("Stage")}>
