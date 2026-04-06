@@ -146,7 +146,7 @@ export default function Stage({ onClose, onWin }: Props) {
 
   const enemyAction = () => {
     // 상대는 랜덤으로 액션을 취한다
-    const action = getRandomNumber(5);
+    const action = getRandomNumber(8);
     const side = "enemy";
 
     switch (action) {
@@ -154,6 +154,9 @@ export default function Stage({ onClose, onWin }: Props) {
       case 0:
       case 1:
       case 2:
+      case 3:
+      case 4:
+      case 5:
         setDialogInfo({
           side,
           type: "punch",
@@ -161,7 +164,7 @@ export default function Stage({ onClose, onWin }: Props) {
           text: selectedCat!.dialog.punch,
         });
         break;
-      case 3: // 도발
+      case 6: // 도발
         setDialogInfo({
           side,
           type: "provoke",
@@ -169,7 +172,7 @@ export default function Stage({ onClose, onWin }: Props) {
           text: selectedCat!.dialog.provoke,
         });
         break;
-      case 4: // 유혹
+      case 7: // 유혹
         setDialogInfo({
           side,
           type: "seduce",
@@ -210,7 +213,7 @@ export default function Stage({ onClose, onWin }: Props) {
             animate: { opacity: 1, x: 0 },
             transition: { duration: 0.3, delay: 0.2 },
           }}
-          isSpeaking={dialogInfo?.side === "enemy"}
+          isSpeaking={dialogInfo?.side === "enemy" && enemyEffect !== "lose"}
         >
           <Effects
             target="enemy"
