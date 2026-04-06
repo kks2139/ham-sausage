@@ -53,9 +53,14 @@ export default function Stage({ onClose, onWin }: Props) {
   const [punchedBy, setPunchedBy] = useState<Side>();
   const [seducedBy, setSeducedBy] = useState<Side>();
   const [provokedBy, setProvokedBy] = useState<Side>();
+  const [isRun, setIsRun] = useState(false);
+
+  const isVictory = !!winner && winner === "me";
 
   const enemyEffect: EffectType | undefined =
-    provokedBy === "me"
+    winner === "me"
+      ? "lose"
+      : provokedBy === "me"
       ? "provoke"
       : seducedBy === "me"
       ? "seduce"
@@ -63,16 +68,17 @@ export default function Stage({ onClose, onWin }: Props) {
       ? "punch"
       : undefined;
 
-  const myEffect: EffectType | undefined =
-    provokedBy === "enemy"
-      ? "provoke"
-      : seducedBy === "enemy"
-      ? "seduce"
-      : punchedBy === "enemy"
-      ? "punch"
-      : undefined;
-
-  const isVictory = !!winner && winner === "me";
+  const myEffect: EffectType | undefined = isRun
+    ? "run"
+    : winner === "enemy"
+    ? "lose"
+    : provokedBy === "enemy"
+    ? "provoke"
+    : seducedBy === "enemy"
+    ? "seduce"
+    : punchedBy === "enemy"
+    ? "punch"
+    : undefined;
 
   // return: 승리한 사이드
   const punch = async (side: Side): Promise<Side | void> => {
@@ -142,14 +148,6 @@ export default function Stage({ onClose, onWin }: Props) {
     const action = getRandomNumber(5);
     const side = "enemy";
 
-    setDialogInfo({
-      side,
-      type: "punch",
-      speaker: selectedCat!.name,
-      text: selectedCat!.dialog.punch,
-    });
-    return;
-
     switch (action) {
       // 냥냥펀치
       case 0:
@@ -193,6 +191,7 @@ export default function Stage({ onClose, onWin }: Props) {
   return (
     <div className={cn("Stage")}>
       <div className={cn("view")}>
+        {/* 적 고양이 */}
         <Player
           side="enemy"
           cat={selectedCat}
@@ -219,6 +218,7 @@ export default function Stage({ onClose, onWin }: Props) {
           />
         </Player>
 
+        {/* 나 */}
         <Player
           side="me"
           cat={me}
@@ -338,6 +338,8 @@ export default function Stage({ onClose, onWin }: Props) {
                   setIsShowFinishPopup(true);
                   break;
                 case "run":
+                  setIsRun(true);
+
                   setDialogInfo({
                     side: "enemy",
                     type: "run",

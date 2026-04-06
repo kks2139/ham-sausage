@@ -27,11 +27,9 @@ function CatVisual({
   children,
 }: CatVisualProps) {
   return (
-    <motion.div className={cn("imgs")} {...catImgIntroMotion}>
+    <motion.div {...catImgIntroMotion}>
       <Image
-        className={cn("cat-img", {
-          hit: effectType === "punch",
-        })}
+        className={cn("cat-img", { [effectType || ""]: true })}
         src={cat?.img.src || ""}
         alt={cat?.name || ""}
         width={100}
@@ -48,7 +46,6 @@ interface Props extends StatusProps, CatVisualProps {
 }
 
 export default function Player({
-  side,
   cat,
   hp,
   introMotion,
@@ -57,6 +54,7 @@ export default function Player({
   effectType,
   catImgIntroMotion,
   children,
+  side,
 }: Props) {
   const [hpEffect, setHpEffect] = useState<StatusProps["hpEffect"]>();
   const prevHp = useRef(hp);

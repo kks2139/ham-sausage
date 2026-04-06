@@ -1,25 +1,33 @@
 .Player {
   width: 100%;
   display: flex;
+  justify-content: space-between;
   column-gap: 15px;
   color: white;
-  justify-content: space-between;
 
   .cat {
     position: relative;
-  }
-
-  .imgs {
-    position: relative;
 
     .cat-img {
-      &.hit {
+      transition: 0.5s;
+
+      &.punch {
         animation: hit 0.5s;
+      }
+
+      &.lose {
+        transform: rotate(20deg) translateY(10px);
+        filter: grayscale(100%) brightness(0.5);
+      }
+
+      &.run {
+        animation: run-to-left 1.5s forwards;
       }
     }
 
     @keyframes hit {
-      0% {
+      0%,
+      100% {
         transform: translateX(0);
       }
       33% {
@@ -28,8 +36,17 @@
       66% {
         transform: translateX(10px);
       }
-      100% {
+    }
+
+    @keyframes run-to-left {
+      0% {
         transform: translateX(0);
+      }
+      10% {
+        transform: translateX(20px);
+      }
+      100% {
+        transform: translateX(-50vw);
       }
     }
   }

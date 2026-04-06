@@ -1,5 +1,5 @@
 .Status {
-  font-size: 16px;
+  font-size: 15px;
 
   &.me {
     display: flex;
@@ -42,7 +42,7 @@
         position: absolute;
         top: 0;
         left: 0;
-        transition: width 2s;
+        transition: width 1.5s;
         background-color: rgb(255, 87, 87);
       }
     }

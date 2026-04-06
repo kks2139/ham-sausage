@@ -10,7 +10,7 @@ import styles from "./index.module.scss";
 
 const cn = classNames.bind(styles);
 
-export type EffectType = "punch" | "seduce" | "provoke";
+export type EffectType = "punch" | "seduce" | "provoke" | "lose" | "run";
 
 interface Props {
   effectType?: EffectType;
