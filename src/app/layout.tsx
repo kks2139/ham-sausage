@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { headers } from "next/headers";
 
 import { DeviceProvider } from "./components/DeviceProvider";
+import ReactQueryProvider from "./components/ReactQueryProvider";
 import ToastMessage from "./components/ToastMessage";
 
 export const metadata: Metadata = {
@@ -23,12 +24,14 @@ export default async function RootLayout({
 
   return (
     <html lang="ko">
-      <DeviceProvider isMobile={isMobile}>
-        <body>
-          {children}
-          <ToastMessage />
-        </body>
-      </DeviceProvider>
+      <body>
+        <DeviceProvider isMobile={isMobile}>
+          <ReactQueryProvider>
+            {children}
+            <ToastMessage />
+          </ReactQueryProvider>
+        </DeviceProvider>
+      </body>
     </html>
   );
 }

@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import ImgCatGang from "@/assets/img/cat_gang.png";
 
 import Button from "../components/Button";
+import { useUsersQuery } from "../queries/useUsersQuery";
 import { useViewStore } from "../store/view";
 import styles from "./page.module.scss";
 
@@ -15,6 +16,8 @@ const cn = classNames.bind(styles);
 export default function Entry() {
   const { addToastMessage } = useViewStore((s) => s.actions);
   const router = useRouter();
+
+  const { isLoading, refetch } = useUsersQuery();
 
   return (
     <main className={cn("Entry")}>
@@ -47,6 +50,18 @@ export default function Entry() {
           }}
         >
           랭킹
+        </Button>
+        <Button
+          disabled={isLoading}
+          onClick={async () => {
+            const { data } = await refetch();
+
+            addToastMessage({
+              message: `name : ${data?.name} / createdAt : ${data?.createdAt}`,
+            });
+          }}
+        >
+          유저정보
         </Button>
       </div>
     </main>
